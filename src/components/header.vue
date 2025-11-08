@@ -34,21 +34,35 @@
       >
         <Icon icon="heroicons:bars-3-20-solid" class="w-5 h-5" />
       </button>
+      <button
+        type="button"
+        class="rounded-lg px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
+        @click="themeStore.toggleTheme()"
+        aria-label="Toggle theme"
+      >
+        <Icon icon="heroicons:moon-20-solid" class="w-5 h-5" />
+      </button>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { Icon } from "@iconify/vue";
 import { useSidebarStore } from "../stores/sidebar";
 import { useSearchStore } from "../stores/search";
 import SearchInput from "./input/search.vue";
+import { useThemeStore } from "../stores/darkMode";
 
 const sidebarStore = useSidebarStore();
 const searchStore = useSearchStore();
+const themeStore = useThemeStore();
 
+
+onMounted(() => {
+  themeStore.initTheme()
+})
 const { query, placeholder, emptyText } = storeToRefs(searchStore);
 
 const searchValue = computed({
