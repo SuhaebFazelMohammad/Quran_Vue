@@ -25,9 +25,10 @@
 
     <Table
       :columns="columns"
-      :rows="rows"
+      :rows="filteredRows"
       :loading="loading"
-      :pageSize="Number(pageSize)"
+      :pageSize="pageSizeNumber"
+      :empty-text="emptyStateMessage"
       v-model:modelValuePage="page"
       @sort-change="onSortChange"
     >
@@ -62,13 +63,19 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
 import Table, { type TableColumn } from "../../../components/table.vue";
 import Select from "../../../components/input/select.vue";
-import { ref } from "vue";
+import { useSearchStore } from "../../../stores/search";
 
 const loading = ref(false);
 const page = ref(1);
 const pageSize = ref<number | null>(10);
+
+const searchStore = useSearchStore();
+const { query } = storeToRefs(searchStore);
+
 const pageSizeOptions = [
   { value: 5, label: "5" },
   { value: 10, label: "10" },
@@ -83,7 +90,7 @@ const columns: TableColumn[] = [
   { key: "actions", label: "Actions" },
 ];
 
-const rows = ref([
+const allRows = ref([
   { id: 1, name: "Ali", email: "ali@example.com", role: "Admin" },
   { id: 2, name: "Fatima", email: "fatima@example.com", role: "User" },
   { id: 3, name: "Aisha", email: "aisha@example.com", role: "User" },
@@ -109,6 +116,51 @@ const rows = ref([
   { id: 23, name: "Bilal", email: "bilal@example.com", role: "User" },
   { id: 24, name: "Zainab", email: "zainab@example.com", role: "User" },
 ]);
+
+const filteredRows = computed(() => {
+  const value = query.value.trim().toLowerCase();
+  if (!value) {
+    return allRows.value;
+  }
+  return allRows.value.filter((row) =>
+    [row.name, row.email, row.role].join(" ").toLowerCase().includes(value)
+  );
+});
+
+const pageSizeNumber = computed(() => Number(pageSize.value ?? 10));
+
+const emptyStateMessage = computed(() => {
+  if (!filteredRows.value.length) {
+    return query.value
+      ? `No users found for "${query.value}"`
+      : "No data available";
+  }
+  return "No data available";
+});
+
+watch(query, () => {
+  page.value = 1;
+});
+
+watch([filteredRows, pageSizeNumber], ([rows, size]) => {
+  const totalPages = Math.max(1, Math.ceil(rows.length / Math.max(size, 1)));
+  if (page.value > totalPages) {
+    page.value = totalPages;
+  }
+});
+
+onMounted(() => {
+  searchStore.setContext({
+    placeholder: "Search users by name, email, or role",
+    emptyText: "Try typing part of a name like Ali or a role like Admin",
+  });
+  searchStore.clearQuery();
+});
+
+onBeforeUnmount(() => {
+  searchStore.resetContext();
+  searchStore.clearQuery();
+});
 
 function onSortChange(payload: { key: string; direction: "asc" | "desc" }) {
   // Example: here you could fetch server-side with sort params
