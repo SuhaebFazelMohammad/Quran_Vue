@@ -19,7 +19,15 @@
       />
       <button
         type="button"
-        class="rounded-lg px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px relative"
+        class="rounded-lg cursor-pointer px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
+        @click="toggleSidebar"
+        aria-label="Toggle sidebar"
+      >
+        <Icon icon="heroicons:bars-3-20-solid" class="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        class="rounded-lg cursor-pointer px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px relative"
       >
         <Icon icon="heroicons:bell-alert-20-solid" class="w-5 h-5" />
         <span
@@ -28,19 +36,17 @@
       </button>
       <button
         type="button"
-        class="rounded-lg px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
-        @click="toggleSidebar"
-        aria-label="Toggle sidebar"
-      >
-        <Icon icon="heroicons:bars-3-20-solid" class="w-5 h-5" />
-      </button>
-      <button
-        type="button"
-        class="rounded-lg px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
+        class="rounded-lg cursor-pointer px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
         @click="themeStore.toggleTheme()"
         aria-label="Toggle theme"
       >
         <Icon icon="heroicons:moon-20-solid" class="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        class="rounded-lg cursor-pointer px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
+      >
+        <Icon icon="heroicons:user-20-solid" class="w-5 h-5" />
       </button>
     </div>
   </header>
@@ -59,10 +65,9 @@ const sidebarStore = useSidebarStore();
 const searchStore = useSearchStore();
 const themeStore = useThemeStore();
 
-
 onMounted(() => {
-  themeStore.initTheme()
-})
+  themeStore.initTheme();
+});
 const { query, placeholder, emptyText } = storeToRefs(searchStore);
 
 const searchValue = computed({

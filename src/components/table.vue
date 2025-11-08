@@ -94,53 +94,23 @@
       </table>
     </div>
 
-    <div
-      v-if="loading"
-      class="absolute inset-0 grid place-items-center bg-white/60 rounded-xl"
-    >
-      <span
-        class="inline-block w-5 h-5 border-2 border-amber-500/60 border-r-transparent rounded-full animate-spin"
-      ></span>
-    </div>
+    <Loading v-if="loading" />
 
-    <div
+    <Pagination
       v-if="showPagination"
-      class="flex items-center justify-between mt-3 text-sm"
-    >
-      <div class="text-slate-500">
-        Showing
-        <span class="font-medium text-slate-700">{{ startRow + 1 }}</span>
-        to
-        <span class="font-medium text-slate-700">{{ endRow }}</span>
-        of
-        <span class="font-medium text-slate-700">{{ totalRows }}</span>
-        entries
-      </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-          :disabled="currentPage <= 1"
-          @click="goTo(currentPage - 1)"
-        >
-          Prev
-        </button>
-        <span class="px-2 text-slate-600"
-          >Page {{ currentPage }} / {{ totalPages }}</span
-        >
-        <button
-          class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-          :disabled="currentPage >= totalPages"
-          @click="goTo(currentPage + 1)"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+      class="mt-3"
+      :page="currentPage"
+      :page-size="props.pageSize"
+      :total="totalRows"
+      @update:page="goTo"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from "vue";
+import Pagination from "./pagination.vue";
+import Loading from "./loading.vue";
 
 type Primitive = string | number | boolean | null | undefined;
 

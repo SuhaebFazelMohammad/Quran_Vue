@@ -2,6 +2,11 @@
   <div class="space-y-4">
     <div class="flex flex-col gap-y-3">
       <h1 class="text-base font-semibold text-slate-800">Users</h1>
+      <div class="flex items-center gap-2">
+        <SelectFilter :options="roleFilterOptions" v-model="selectedRole" :clearable="true" :searchable="false" class="w-40" placeholder="Filter by role" />
+        <SelectFilter :options="roleFilterOptions" v-model="selectedRole" :clearable="true" :searchable="false" class="w-40" placeholder="Filter by role" />
+        <SelectFilter :options="roleFilterOptions" v-model="selectedRole" :clearable="true" :searchable="false" class="w-40" placeholder="Filter by role" />
+      </div>
       <div class="flex justify-between items-center gap-3">
         <div class="flex items-center gap-2 text-sm text-slate-600">
           <span>Show</span>
@@ -44,18 +49,14 @@
       </template>
 
       <!-- Example: custom actions cell -->
-      <template #cell-actions>
+      <template #cell-actions="{ row }">
         <div class="flex items-center gap-2">
-          <button
-            class="px-2 py-1 text-xs rounded border border-slate-200 hover:bg-slate-50"
-          >
-            Edit
-          </button>
-          <button
-            class="px-2 py-1 text-xs rounded border border-slate-200 hover:bg-slate-50"
-          >
-            Delete
-          </button>
+          <EditButton class="text-xs" @click="handleEdit(row)" />
+          <DeleteButton
+            class="text-xs"
+            :confirm-message="`Are you sure you want to delete ${row.name}?`"
+            @confirm="handleDelete(row)"
+          />
         </div>
       </template>
     </Table>
@@ -64,10 +65,14 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import SelectInput from "../../../components/input/select.vue";
 import { storeToRefs } from "pinia";
 import Table, { type TableColumn } from "../../../components/table.vue";
 import Select from "../../../components/input/select.vue";
 import { useSearchStore } from "../../../stores/search";
+import DeleteButton from "../../../components/buttons/delete.vue";
+import EditButton from "../../../components/buttons/edit.vue";
+import SelectFilter from "../../../components/input/selectFilter.vue";
 
 const loading = ref(false);
 const page = ref(1);
@@ -82,6 +87,19 @@ const pageSizeOptions = [
   { value: 20, label: "20" },
   { value: 50, label: "50" },
 ];
+
+const roleFilterOptions = [
+  { value: "Admin", label: "Admin" },
+  { value: "User", label: "User" },
+  { value: "Super Admin", label: "Super Admin" },
+  { value: "Moderator", label: "Moderator" },
+  { value: "Editor", label: "Editor" },
+  { value: "Viewer", label: "Viewer" },
+  { value: "Guest", label: "Guest" },
+  { value: "Member", label: "Member" },
+];
+
+const selectedRole = ref<string | null>(null);
 
 const columns: TableColumn[] = [
   { key: "name", label: "Name", sortable: true },
@@ -118,13 +136,21 @@ const allRows = ref([
 ]);
 
 const filteredRows = computed(() => {
-  const value = query.value.trim().toLowerCase();
-  if (!value) {
-    return allRows.value;
-  }
-  return allRows.value.filter((row) =>
-    [row.name, row.email, row.role].join(" ").toLowerCase().includes(value)
-  );
+  const searchValue = query.value.trim().toLowerCase();
+  const roleValue = selectedRole.value?.toLowerCase() ?? "";
+
+  return allRows.value.filter((row) => {
+    const matchesSearch = searchValue
+      ? [row.name, row.email, row.role]
+          .join(" ")
+          .toLowerCase()
+          .includes(searchValue)
+      : true;
+
+    const matchesRole = roleValue ? row.role.toLowerCase() === roleValue : true;
+
+    return matchesSearch && matchesRole;
+  });
 });
 
 const pageSizeNumber = computed(() => Number(pageSize.value ?? 10));
@@ -139,6 +165,10 @@ const emptyStateMessage = computed(() => {
 });
 
 watch(query, () => {
+  page.value = 1;
+});
+
+watch(selectedRole, () => {
   page.value = 1;
 });
 
@@ -166,5 +196,15 @@ function onSortChange(payload: { key: string; direction: "asc" | "desc" }) {
   // Example: here you could fetch server-side with sort params
   // For demo, we do nothing; table handles local sorting
   console.log("sort-change", payload);
+}
+
+function handleDelete(row: any) {
+  // Replace with API call / mutation once backend is connected
+  console.log("delete", row);
+}
+
+function handleEdit(row: any) {
+  // Replace with navigation or modal invocation when ready
+  console.log("edit", row);
 }
 </script>
