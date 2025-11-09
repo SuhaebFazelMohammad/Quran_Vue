@@ -1,19 +1,37 @@
 <template>
   <div
-    class="min-h-dvh bg-[radial-gradient(1200px_800px_at_10%_10%,rgba(87,13,248,0.08),transparent),radial-gradient(800px_600px_at_90%_10%,rgba(9,176,255,0.08),transparent),linear-gradient(180deg,#0b1020_0%,#0a0d1a_100%)] text-slate-200 flex items-center justify-center px-4"
+    class="relative min-h-dvh bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200 flex items-center justify-center px-4 overflow-hidden"
   >
+    <div
+      class="pointer-events-none absolute inset-0 -z-10 bg-mesh-dark opacity-90"
+    ></div>
+    <div
+      class="pointer-events-none absolute inset-x-0 top-[-20%] h-[480px] bg-gradient-to-b from-amber-500/20 via-transparent to-transparent blur-3xl"
+    ></div>
     <div class="w-full max-w-md">
       <div
-        class="bg-white/5 backdrop-blur-md border border-indigo-400/20 rounded-2xl shadow-2xl shadow-black/40 px-6 py-7"
+        class="surface-card border border-slate-700/60 bg-slate-950/80 px-8 py-10 shadow-2xl shadow-black/50"
       >
-        <div class="flex flex-col items-center gap-2 mb-3">
-          <h1 class="m-0 text-xl font-bold">Welcome back</h1>
-          <p class="m-0 text-slate-400 text-sm">Please sign in to continue</p>
+        <div class="flex flex-col items-center gap-3 mb-6 text-center">
+          <span
+            class="surface-pill border-amber-400/40 bg-amber-500/10 text-amber-200"
+          >
+            <Icon icon="heroicons:sparkles-20-solid" class="h-4 w-4" />
+            Quran Admin
+          </span>
+          <h1 class="m-0 text-2xl font-semibold text-white tracking-tight">
+            Welcome back
+          </h1>
+          <p class="m-0 text-sm text-slate-400">
+            Sign in to keep the recitation experience thriving.
+          </p>
         </div>
 
-        <form class="grid gap-3 mt-1" @submit.prevent="onSubmit">
-          <div class="grid gap-2">
-            <label for="email" class="text-sm text-slate-300">Email</label>
+        <form class="grid gap-4" @submit.prevent="onSubmit">
+          <div class="grid gap-2 text-left">
+            <label for="email" class="text-sm font-medium text-slate-300"
+              >Email</label
+            >
             <input
               id="email"
               type="email"
@@ -21,10 +39,10 @@
               placeholder="you@example.com"
               autocomplete="email"
               :class="[
-                'w-full rounded-xl bg-white/5 border px-3 py-2.5 outline-none text-slate-100 placeholder:text-slate-400 transition focus:ring-4',
+                'w-full rounded-xl border bg-slate-900/70 px-3 py-3 outline-none text-slate-100 placeholder:text-slate-500 transition focus:ring-4',
                 errors.email
                   ? 'border-red-500/80 ring-0 focus:ring-red-500/20'
-                  : 'border-slate-400/20 focus:border-indigo-400/60 focus:ring-indigo-500/20',
+                  : 'border-slate-700/70 focus:border-amber-400 focus:ring-amber-400/20',
               ]"
             />
             <p v-if="errors.email" class="m-0 text-xs text-red-300">
@@ -32,10 +50,10 @@
             </p>
           </div>
 
-          <div class="grid gap-2">
-            <label for="password" class="text-sm text-slate-300"
-              >Password</label
-            >
+          <div class="grid gap-2 text-left">
+            <label for="password" class="text-sm font-medium text-slate-300">
+              Password
+            </label>
             <div class="relative">
               <input
                 id="password"
@@ -44,15 +62,15 @@
                 placeholder="••••••••"
                 autocomplete="current-password"
                 :class="[
-                  'w-full rounded-xl bg-white/5 border px-3 py-2.5 outline-none text-slate-100 placeholder:text-slate-400 transition pr-16 focus:ring-4',
+                  'w-full rounded-xl border bg-slate-900/70 px-3 py-3 pr-16 outline-none text-slate-100 placeholder:text-slate-500 transition focus:ring-4',
                   errors.password
                     ? 'border-red-500/80 ring-0 focus:ring-red-500/20'
-                    : 'border-slate-400/20 focus:border-indigo-400/60 focus:ring-indigo-500/20',
+                    : 'border-slate-700/70 focus:border-amber-400 focus:ring-amber-400/20',
                 ]"
               />
               <button
                 type="button"
-                class="absolute inset-y-0 right-2 my-auto h-9 px-3 text-xs text-slate-400 hover:text-slate-200 rounded-lg hover:bg-white/5 transition"
+                class="absolute inset-y-0 right-2 my-auto inline-flex h-9 items-center rounded-lg px-3 text-xs text-slate-400 transition hover:bg-slate-800/60 hover:text-slate-200"
                 aria-label="Toggle password visibility"
                 @click="showPassword = !showPassword"
               >
@@ -65,7 +83,7 @@
           </div>
 
           <button
-            class="mt-1 inline-flex w-full items-center justify-center rounded-xl border border-indigo-400/30 bg-gradient-to-b from-indigo-500 to-indigo-600 text-white font-semibold py-2.5 shadow-lg shadow-indigo-600/30 hover:brightness-105 active:translate-y-px transition disabled:opacity-75 disabled:cursor-not-allowed"
+            class="glass-button w-full justify-center bg-amber-500/95 py-2.5 font-semibold shadow-amber-500/30 transition disabled:cursor-not-allowed disabled:opacity-70"
             type="submit"
             :disabled="loading"
           >
@@ -89,18 +107,6 @@
             {{ serverMessage }}
           </p>
         </form>
-
-        <div
-          class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 my-5 text-slate-400 text-xs"
-        >
-          <div
-            class="h-px bg-gradient-to-r from-indigo-400/20 to-transparent"
-          ></div>
-          <span>or continue with</span>
-          <div
-            class="h-px bg-gradient-to-l from-indigo-400/20 to-transparent"
-          ></div>
-        </div>
       </div>
     </div>
   </div>

@@ -3,7 +3,7 @@
     <label
       v-if="label"
       :for="id"
-      class="block mb-1.5 text-sm font-medium text-slate-700"
+      class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
       >{{ label }}</label
     >
 
@@ -16,7 +16,7 @@
       <!-- Left Icon -->
       <div
         v-if="iconLeft"
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
       >
         <Icon :icon="iconLeft" class="w-5 h-5" />
       </div>
@@ -32,13 +32,13 @@
         :maxlength="maxlength"
         :minlength="minlength"
         :autocomplete="autocomplete"
-        class="w-full rounded-xl border px-3 py-2.5 bg-white text-slate-800 placeholder:text-slate-400 transition focus:outline-none"
+        class="w-full rounded-xl border px-3 py-2.5 bg-white text-slate-800 placeholder:text-slate-400 transition focus:outline-none dark:bg-slate-950/60 dark:text-slate-100 dark:placeholder:text-slate-500"
         :class="[
           error
             ? 'border-red-300 ring-4 ring-red-100 focus:border-red-400 focus:ring-red-200'
             : focused
-            ? 'border-amber-300 ring-4 ring-amber-100 focus:border-amber-400 focus:ring-amber-200'
-            : 'border-slate-200 hover:bg-slate-50 focus:border-amber-300 focus:ring-4 focus:ring-amber-100',
+            ? 'border-amber-300 ring-4 ring-amber-100 focus:border-amber-400 focus:ring-amber-200 dark:border-amber-400/70 dark:ring-amber-400/10'
+            : 'border-slate-200 hover:bg-slate-50 focus:border-amber-300 focus:ring-4 focus:ring-amber-100 dark:border-slate-700 dark:hover:bg-slate-900/60 dark:focus:border-amber-400',
           iconLeft ? 'pl-10' : '',
           iconRight || clearable ? 'pr-10' : '',
         ]"
@@ -59,7 +59,7 @@
         <button
           v-if="clearable && modelValue"
           type="button"
-          class="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition"
+          class="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-200"
           @click="clear"
           aria-label="Clear input"
         >
@@ -78,9 +78,9 @@
 
     <!-- Helper Text -->
     <div class="mt-1.5 text-xs">
-      <p v-if="error" class="text-red-600">{{ error }}</p>
-      <p v-else-if="hint" class="text-slate-500">{{ hint }}</p>
-      <p v-else-if="maxlength && showCharCount" class="text-slate-500">
+      <p v-if="error" class="text-red-600 dark:text-red-400">{{ error }}</p>
+      <p v-else-if="hint" class="text-slate-500 dark:text-slate-400">{{ hint }}</p>
+      <p v-else-if="maxlength && showCharCount" class="text-slate-500 dark:text-slate-400">
         {{ charCount }} / {{ maxlength }}
       </p>
     </div>

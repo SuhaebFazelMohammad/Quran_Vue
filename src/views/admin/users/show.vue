@@ -4,7 +4,7 @@
 
     <div
       v-if="notFound"
-      class="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm"
+      class="surface-card p-8 text-center"
     >
       <div
         class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600"
@@ -30,7 +30,7 @@
       class="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
     >
       <section class="space-y-6">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="surface-card">
           <div class="flex flex-wrap items-start gap-4">
             <div class="flex items-center gap-4">
               <div
@@ -84,7 +84,7 @@
             <div
               v-for="stat in statCards"
               :key="stat.id"
-              class="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
+              class="surface-panel"
             >
               <div class="flex items-center justify-between">
                 <span
@@ -103,14 +103,14 @@
 
         <div class="grid gap-6 lg:grid-cols-2">
           <div
-            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            class="surface-card"
           >
             <h3 class="text-sm font-semibold text-slate-700">Contact</h3>
             <div class="mt-4 space-y-4">
               <div
                 v-for="detail in contactDetails"
                 :key="detail.label"
-                class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-sm"
+                class="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm transition dark:border-slate-800/70 dark:bg-slate-900/50"
               >
                 <div class="flex items-center gap-3 text-slate-500">
                   <Icon :icon="detail.icon" class="h-5 w-5 text-amber-500" />
@@ -126,7 +126,7 @@
           </div>
 
           <div
-            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            class="surface-card"
           >
             <h3 class="text-sm font-semibold text-slate-700">Teams & Focus</h3>
             <div class="mt-3">
@@ -137,7 +137,7 @@
                 <span
                   v-for="team in teams"
                   :key="team"
-                  class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                  class="surface-pill"
                 >
                   <Icon
                     icon="heroicons:user-group-20-solid"
@@ -158,7 +158,7 @@
                 <span
                   v-for="area in focusAreas"
                   :key="area"
-                  class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600"
+                  class="inline-flex items-center gap-1 rounded-full bg-emerald-100/70 px-3 py-1 text-xs font-medium text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300"
                 >
                   <Icon
                     icon="heroicons:sparkles-20-solid"
@@ -174,7 +174,7 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="surface-card">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-slate-700">
               Permissions & Access
@@ -188,7 +188,7 @@
             <li
               v-for="permission in permissions"
               :key="permission"
-              class="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-sm text-slate-600"
+              class="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm text-slate-600 transition dark:border-slate-800/70 dark:bg-slate-900/50 dark:text-slate-300"
             >
               <Icon
                 icon="heroicons:check-circle-20-solid"
@@ -204,9 +204,9 @@
             </li>
           </ul>
 
-          <div
+            <div
             v-if="hasNotes"
-            class="mt-5 rounded-xl bg-slate-50/80 p-4 text-sm text-slate-600"
+            class="mt-5 rounded-xl border border-slate-200/60 bg-white/80 p-4 text-sm text-slate-600 dark:border-slate-800/60 dark:bg-slate-900/50 dark:text-slate-300"
           >
             <p
               class="text-xs font-semibold uppercase tracking-wide text-slate-400"
@@ -221,11 +221,11 @@
       </section>
 
       <aside class="space-y-4">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="surface-card">
           <h3 class="text-sm font-semibold text-slate-700">Account timeline</h3>
           <dl class="mt-4 space-y-3 text-sm text-slate-600">
             <div
-              class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+              class="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 transition dark:border-slate-800/70 dark:bg-slate-900/50"
             >
               <dt class="flex items-center gap-2 text-slate-500">
                 <Icon
@@ -239,7 +239,7 @@
               </dd>
             </div>
             <div
-              class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+              class="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 transition dark:border-slate-800/70 dark:bg-slate-900/50"
             >
               <dt class="flex items-center gap-2 text-slate-500">
                 <Icon
@@ -253,7 +253,7 @@
               </dd>
             </div>
             <div
-              class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+              class="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 transition dark:border-slate-800/70 dark:bg-slate-900/50"
             >
               <dt class="flex items-center gap-2 text-slate-500">
                 <Icon
@@ -269,7 +269,7 @@
           </dl>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="surface-card">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-slate-700">
               Recent activity
@@ -282,7 +282,7 @@
             <li
               v-for="item in activity"
               :key="item.id"
-              class="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+              class="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 transition dark:border-slate-800/70 dark:bg-slate-900/50"
             >
               <span
                 class="mt-1 h-2.5 w-2.5 rounded-full"
@@ -297,7 +297,7 @@
             </li>
             <li
               v-if="activity.length === 0"
-              class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500"
+              class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400"
             >
               No recorded activity for this user yet.
             </li>
@@ -305,7 +305,7 @@
         </div>
 
         <div
-          class="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 shadow-sm"
+          class="rounded-2xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-lg shadow-amber-500/10 dark:border-amber-400/40 dark:bg-amber-400/15 dark:text-amber-100"
         >
           <div class="flex items-center gap-3">
             <Icon
@@ -324,7 +324,7 @@
           </div>
           <RouterLink
             :to="`/users/${user.id}/edit`"
-            class="mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-600 transition hover:bg-amber-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100"
+            class="mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-600 transition hover:bg-amber-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 dark:border-amber-400/50 dark:bg-slate-900/40 dark:text-amber-200 dark:hover:bg-amber-400/10"
           >
             <Icon icon="heroicons:calendar-20-solid" class="h-4 w-4" />
             Schedule follow-up

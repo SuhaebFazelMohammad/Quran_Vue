@@ -3,7 +3,7 @@
     <label
       v-if="label"
       :for="id"
-      class="block mb-1.5 text-sm font-medium text-slate-700"
+      class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
       >{{ label }}</label
     >
 
@@ -17,13 +17,13 @@
       <button
         :id="id"
         type="button"
-        class="w-full inline-flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 bg-white text-left text-slate-800 transition focus:outline-none"
+        class="inline-flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 bg-white text-left text-slate-800 transition focus:outline-none dark:bg-slate-950/60 dark:text-slate-100"
         :class="[
           error
-            ? 'border-red-300 ring-4 ring-red-100'
+            ? 'border-red-300 ring-4 ring-red-100 dark:border-red-400/70'
             : open
-            ? 'border-amber-300 ring-4 ring-amber-100'
-            : 'border-slate-200 hover:bg-slate-50',
+            ? 'border-amber-300 ring-4 ring-amber-100 dark:border-amber-400/70 dark:ring-amber-400/10'
+            : 'border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-900/60',
         ]"
         :aria-expanded="open ? 'true' : 'false'"
         role="combobox"
@@ -44,14 +44,14 @@
         <div class="flex items-center gap-1">
           <span
             v-if="clearable && modelValue != null"
-            class="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100"
+            class="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-200"
             @click.stop="clear()"
             aria-label="Clear selection"
             >✕</span
           >
           <Icon
             :icon="'heroicons:chevron-down-20-solid'"
-            :class="['w-4 h-4 transition', open ? 'rotate-180' : '']"
+            :class="['h-4 w-4 transition', open ? 'rotate-180' : '']"
           />
         </div>
       </button>
@@ -60,14 +60,14 @@
       <transition name="fade" appear>
         <div
           v-if="open"
-          class="absolute z-50 mt-2 w-full rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden"
+          class="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-950/90"
         >
           <!-- Search -->
-          <div v-if="searchable" class="p-2 border-b border-slate-200">
+          <div v-if="searchable" class="border-b border-slate-200 p-2 dark:border-slate-800">
             <input
               v-model.trim="query"
               type="text"
-              class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100"
+              class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-amber-400"
               placeholder="Search..."
               @keydown.down.prevent="onArrow(1)"
               @keydown.up.prevent="onArrow(-1)"
@@ -82,16 +82,16 @@
             role="listbox"
             class="max-h-64 overflow-auto py-1"
           >
-            <li v-if="loading" class="px-3 py-6 text-center text-slate-500">
+            <li v-if="loading" class="px-3 py-6 text-center text-slate-500 dark:text-slate-400">
               <span
-                class="inline-block w-5 h-5 border-2 border-amber-500/60 border-r-transparent rounded-full animate-spin align-middle mr-2"
+                class="mr-2 inline-block h-5 w-5 animate-spin rounded-full border-2 border-amber-500/60 border-r-transparent align-middle"
               ></span>
               Loading...
             </li>
 
             <li
               v-else-if="filteredOptions.length === 0"
-              class="px-3 py-6 text-center text-slate-500"
+              class="px-3 py-6 text-center text-slate-500 dark:text-slate-400"
             >
               {{ emptyText }}
             </li>
@@ -102,11 +102,11 @@
               role="option"
               :aria-selected="isSelected(opt) ? 'true' : 'false'"
               :class="[
-                'px-3 py-2 text-sm cursor-pointer flex items-center justify-between',
-                i === highlightIndex ? 'bg-amber-50' : '',
+                'flex cursor-pointer items-center justify-between px-3 py-2 text-sm transition',
+                i === highlightIndex ? 'bg-amber-50 dark:bg-amber-400/10' : '',
                 isSelected(opt)
-                  ? 'text-amber-700 font-medium'
-                  : 'text-slate-700',
+                  ? 'font-medium text-amber-700 dark:text-amber-200'
+                  : 'text-slate-700 dark:text-slate-200',
               ]"
               @mouseenter="highlightIndex = i"
               @mouseleave="highlightIndex = -1"
@@ -118,7 +118,7 @@
               <Icon
                 v-if="isSelected(opt)"
                 icon="heroicons:check-20-solid"
-                class="w-4 h-4 text-amber-600"
+                class="h-4 w-4 text-amber-600 dark:text-amber-300"
               />
             </li>
           </ul>
@@ -127,8 +127,8 @@
     </div>
 
     <div class="mt-1.5 text-xs">
-      <p v-if="error" class="text-red-600">{{ error }}</p>
-      <p v-else-if="hint" class="text-slate-500">{{ hint }}</p>
+      <p v-if="error" class="text-red-600 dark:text-red-400">{{ error }}</p>
+      <p v-else-if="hint" class="text-slate-500 dark:text-slate-400">{{ hint }}</p>
     </div>
   </div>
 </template>

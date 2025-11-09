@@ -1,1 +1,105 @@
+/* stylelint-disable */
+
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-100 text-slate-900 antialiased transition-colors duration-500;
+  }
+
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
+    background-image: radial-gradient(
+        circle at 18% 20%,
+        rgba(251, 191, 36, 0.08),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 82% 12%,
+        rgba(79, 70, 229, 0.12),
+        transparent 58%
+      ),
+      radial-gradient(
+        circle at 15% 85%,
+        rgba(45, 212, 191, 0.08),
+        transparent 60%
+      ),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(2, 6, 23, 1) 100%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-amber-400/70 text-slate-900;
+  }
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-slate-200/60 bg-white/90 p-6 shadow-lg shadow-amber-100/30 backdrop-blur-xl transition-colors duration-500 dark:border-slate-800/70 dark:bg-slate-900/60 dark:shadow-black/40;
+  }
+
+  .surface-panel {
+    @apply rounded-xl border border-slate-200/60 bg-white/80 p-4 shadow-md shadow-amber-100/20 backdrop-blur-lg transition-colors duration-500 dark:border-slate-800/70 dark:bg-slate-900/50 dark:shadow-black/40;
+  }
+
+  .surface-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-slate-200/60 bg-white/80 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors duration-300 dark:border-slate-800/70 dark:bg-slate-900/50 dark:text-slate-300;
+  }
+
+  .glass-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-white shadow-sm shadow-amber-500/20 transition-all duration-300 hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/40 dark:shadow-black/40;
+  }
+}
+
+@layer utilities {
+  .bg-mesh-light {
+    background-image: radial-gradient(
+        circle at 18% 25%,
+        rgba(253, 230, 138, 0.12),
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 82% 8%,
+        rgba(148, 197, 253, 0.1),
+        transparent 58%
+      ),
+      radial-gradient(
+        circle at 12% 78%,
+        rgba(216, 180, 254, 0.08),
+        transparent 64%
+      ),
+      radial-gradient(
+        circle at 75% 70%,
+        rgba(248, 250, 252, 0.7),
+        transparent 70%
+      );
+  }
+
+  .bg-mesh-dark {
+    background-image: radial-gradient(
+        circle at 10% 10%,
+        rgba(251, 191, 36, 0.12),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 80% 0%,
+        rgba(79, 70, 229, 0.12),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 15% 85%,
+        rgba(45, 212, 191, 0.12),
+        transparent 60%
+      );
+  }
+}

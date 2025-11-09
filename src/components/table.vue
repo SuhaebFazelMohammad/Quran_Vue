@@ -1,19 +1,21 @@
 <template>
   <div class="relative">
-    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-      <table class="min-w-full text-left text-sm">
-        <thead class="bg-slate-50">
+    <div
+      class="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/85 shadow-xl shadow-amber-500/10 backdrop-blur-lg transition-colors duration-500 dark:border-slate-800/70 dark:bg-slate-900/60 dark:shadow-black/40"
+    >
+      <table class="min-w-full text-left text-sm text-slate-700 dark:text-slate-200">
+        <thead class="bg-slate-50/90 text-slate-600 dark:bg-slate-900/70 dark:text-slate-300">
           <tr>
             <th
               v-for="col in columns"
               :key="String(col.key)"
               scope="col"
-              class="px-4 py-3 font-semibold text-slate-700 select-none"
+              class="px-5 py-4 text-xs font-semibold uppercase tracking-wide select-none"
             >
               <button
                 v-if="col.sortable"
                 type="button"
-                class="inline-flex items-center gap-1 hover:text-amber-700"
+                class="inline-flex items-center gap-1 transition hover:text-amber-600 dark:hover:text-amber-300"
                 @click="toggleSort(col)"
               >
                 <span>{{ col.label }}</span>
@@ -22,7 +24,7 @@
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  class="w-4 h-4 text-slate-400"
+                  class="h-4 w-4 text-slate-400 dark:text-slate-500"
                 >
                   <path
                     fill-rule="evenodd"
@@ -35,7 +37,7 @@
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  class="w-4 h-4 text-amber-600"
+                  class="h-4 w-4 text-amber-600 dark:text-amber-300"
                 >
                   <path
                     fill-rule="evenodd"
@@ -48,7 +50,7 @@
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  class="w-4 h-4 text-amber-600"
+                  class="h-4 w-4 text-amber-600 dark:text-amber-300"
                 >
                   <path
                     fill-rule="evenodd"
@@ -62,19 +64,19 @@
           </tr>
         </thead>
 
-        <tbody>
+        <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/70">
           <tr
             v-for="(row, idx) in pagedRows"
             :key="rowKey(row, idx)"
             :class="[
-              striped && idx % 2 === 1 ? 'bg-slate-50/50' : '',
-              hoverable ? 'hover:bg-amber-50/40' : '',
+              striped && idx % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-900/40' : '',
+              hoverable ? 'transition hover:bg-amber-50/40 dark:hover:bg-amber-400/10' : '',
             ]"
           >
             <td
               v-for="col in columns"
               :key="String(col.key)"
-              class="px-4 py-3 text-slate-700 align-middle"
+              class="px-5 py-4 align-middle text-sm"
             >
               <slot :name="`cell-${String(col.key)}`" :row="row" :column="col">
                 <span>{{ resolveCell(row, col) }}</span>
@@ -85,7 +87,7 @@
           <tr v-if="!loading && totalRows === 0">
             <td
               :colspan="columns.length"
-              class="px-4 py-10 text-center text-slate-500"
+              class="px-5 py-12 text-center text-sm text-slate-500 dark:text-slate-400"
             >
               {{ emptyText }}
             </td>

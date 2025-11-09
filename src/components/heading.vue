@@ -1,8 +1,8 @@
 <template>
-    <div class="flex items-center justify-between">
-        <h1 class="text-base font-semibold text-slate-800">{{ title }}</h1>
+    <div class="flex items-center justify-between gap-3">
+        <h1 class="text-xl font-semibold text-slate-800 dark:text-slate-100">{{ title }}</h1>
         <RouterLink :to="link" 
-        class="px-3 py-2 rounded-lg flex items-center gap-x-2 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"> 
+        class="glass-button bg-amber-500/95 px-4 py-2 text-sm font-medium shadow-amber-500/20"> 
             <span>{{ buttonText }}</span>
             <Icon icon="heroicons:plus-20-solid" class="w-4 h-4" v-if="buttonText.split(' ')[0] === 'Add'" />
             <Icon icon="heroicons:arrow-uturn-left-20-solid" class="w-4 h-4" v-else />

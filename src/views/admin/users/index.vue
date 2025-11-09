@@ -1,9 +1,9 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-y-3">
+  <div class="space-y-6">
+    <div class="space-y-5">
       <Heading title="Users" link="/users/create" buttonText="Add User" />
-      <div class="flex justify-between items-center gap-3">
-        <div class="flex items-center gap-2 text-sm text-slate-600">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
           <span>Show</span>
           <Select
             :options="pageSizeOptions"
@@ -18,9 +18,9 @@
           :options="roleFilterOptions"
           v-model="selectedRole"
           :clearable="true"
-          :searchable="false"
-          class="w-40"
+          :searchable="false" 
           placeholder="Filter by role"
+          icon="heroicons:user-group"
         />
       </div>
     </div>
@@ -34,18 +34,16 @@
       v-model:modelValuePage="page"
       @sort-change="onSortChange"
     >
-      <!-- Example: custom role cell with dot -->
       <template #cell-role="{ row }">
         <span class="inline-flex items-center gap-2">
           <span
-            class="w-2 h-2 rounded-full"
-            :class="row.role === 'Admin' ? 'bg-amber-500' : 'bg-slate-300'"
+            class="h-2 w-2 rounded-full"
+            :class="row.role === 'Admin' ? 'bg-emerald-500' : 'bg-amber-400'"
           ></span>
           {{ row.role }}
         </span>
       </template>
 
-      <!-- Example: custom actions cell -->
       <template #cell-actions="{ row }">
         <div class="flex items-center gap-2">
           <ShowButton :to="`/users/${row.id}`" />

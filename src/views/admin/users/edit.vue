@@ -2,10 +2,7 @@
   <div class="space-y-6">
     <Heading title="Edit User" link="/users" buttonText="Back" />
 
-    <div
-      v-if="notFound"
-      class="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm"
-    >
+    <div v-if="notFound" class="surface-card p-8 text-center">
       <div
         class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600"
       >
@@ -28,27 +25,29 @@
     <div v-else class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <form
         @submit.prevent="handleSubmit"
-        class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+        class="surface-card space-y-6"
         novalidate
       >
         <div class="flex flex-wrap items-center gap-3">
           <div>
-            <p class="text-sm font-semibold text-slate-700">User information</p>
-            <p class="text-xs text-slate-500">
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              User information
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
               Update personal details and manage access for this administrator.
             </p>
           </div>
           <span
-            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
+            class="surface-pill inline-flex items-center gap-2 px-3 py-1 text-xs font-medium"
             :class="statusBadgeClass"
           >
             <span
               class="h-2 w-2 rounded-full"
-              :class="form.isActive ? 'bg-emerald-500' : 'bg-slate-400'"
+              :class="form.isActive ? 'bg-emerald-500 dark:bg-emerald-300' : 'bg-slate-400 dark:bg-slate-500'"
             ></span>
             {{ form.isActive ? "Active" : "Inactive" }}
           </span>
-          <span class="ml-auto text-xs text-slate-500">
+          <span class="ml-auto text-xs text-slate-500 dark:text-slate-400">
             Created {{ formattedCreatedAt }}
           </span>
         </div>
@@ -125,13 +124,15 @@
               id="notes"
               v-model="form.notes"
               rows="4"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-amber-400"
               placeholder="Add a short internal note about this user..."
               maxlength="280"
             ></textarea>
             <div class="text-xs">
-              <p v-if="errors.notes" class="text-red-600">{{ errors.notes }}</p>
-              <p v-else class="text-slate-500">
+              <p v-if="errors.notes" class="text-red-600 dark:text-red-400">
+                {{ errors.notes }}
+              </p>
+              <p v-else class="text-slate-500 dark:text-slate-400">
                 {{ form.notes.length }}/280 characters
               </p>
             </div>
@@ -139,16 +140,20 @@
         </div>
 
         <div
-          class="flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-4"
+          class="surface-panel flex flex-wrap items-center gap-4 px-4 py-4"
         >
           <div>
-            <p class="text-sm font-semibold text-slate-700">Account status</p>
-            <p class="text-xs text-slate-500">{{ statusDescription }}</p>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              Account status
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              {{ statusDescription }}
+            </p>
           </div>
           <button
             type="button"
-            class="relative inline-flex h-7 w-14 items-center rounded-full transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100"
-            :class="form.isActive ? 'bg-emerald-500/90' : 'bg-slate-300'"
+            class="relative inline-flex h-7 w-14 items-center rounded-full transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 dark:focus-visible:ring-amber-400/20"
+            :class="form.isActive ? 'bg-emerald-500/80 dark:bg-emerald-400/60' : 'bg-slate-300 dark:bg-slate-700'"
             :aria-pressed="form.isActive"
             @click="toggleStatus"
           >
@@ -158,7 +163,7 @@
             ></span>
           </button>
           <span
-            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium"
+            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition"
             :class="statusBadgeClass"
           >
             <Icon
@@ -175,7 +180,7 @@
 
         <div
           v-if="successMessage"
-          class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+          class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-200"
         >
           <Icon icon="heroicons:check-circle-20-solid" class="mt-0.5 h-5 w-5" />
           <div>
@@ -188,7 +193,7 @@
           <button
             type="submit"
             :disabled="loading || !isDirty"
-            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+            class="glass-button bg-amber-500/95 px-4 py-2.5 text-sm font-semibold shadow-amber-500/20 transition disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span
               v-if="loading"
@@ -199,7 +204,7 @@
 
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:border-amber-300 hover:text-amber-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:border-amber-400 dark:hover:text-amber-200"
             :disabled="!isDirty || loading"
             @click="resetForm"
           >
@@ -209,81 +214,81 @@
 
           <RouterLink
             to="/users"
-            class="inline-flex items-center gap-2 rounded-lg border border-transparent px-4 py-2.5 text-sm font-medium text-slate-500 transition hover:text-slate-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-100"
+            class="inline-flex items-center gap-2 rounded-lg border border-transparent px-4 py-2.5 text-sm font-medium text-slate-500 transition hover:text-slate-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-100 dark:text-slate-300 dark:hover:text-amber-200"
           >
             Cancel
           </RouterLink>
 
-          <span class="ml-auto text-xs text-slate-500">
+          <span class="ml-auto text-xs text-slate-500 dark:text-slate-400">
             Last saved {{ formattedLastSaved }}
           </span>
         </div>
       </form>
 
       <aside class="space-y-4">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="surface-card">
           <div class="flex items-center gap-4">
             <div
-              class="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-lg font-semibold text-amber-700"
+              class="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-lg font-semibold text-amber-700 dark:bg-amber-400/20 dark:text-amber-200"
             >
               {{ initials }}
             </div>
             <div>
-              <p class="text-sm font-semibold text-slate-700">
+              <p class="text-sm font-semibold text-slate-700 dark:text-slate-100">
                 {{ form.name || "Unnamed user" }}
               </p>
-              <p class="text-xs text-slate-500">
+              <p class="text-xs text-slate-500 dark:text-slate-400">
                 {{ form.email || "No email set" }}
               </p>
             </div>
           </div>
 
-          <div class="mt-5 space-y-3 text-sm text-slate-600">
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-2 text-slate-500">
+          <div class="mt-5 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:shield-check-20-solid"
                   class="h-4 w-4 text-emerald-500"
                 />
                 Role
               </span>
-              <span class="font-medium text-slate-700">
+              <span class="font-medium text-slate-700 dark:text-slate-100">
                 {{ form.role || "Not assigned" }}
               </span>
             </div>
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-2 text-slate-500">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:map-pin-20-solid"
                   class="h-4 w-4 text-amber-500"
                 />
                 Location
               </span>
-              <span class="font-medium text-slate-700">
+              <span class="font-medium text-slate-700 dark:text-slate-100">
                 {{ form.location || "Not specified" }}
               </span>
             </div>
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-2 text-slate-500">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:device-phone-mobile-20-solid"
                   class="h-4 w-4 text-sky-500"
                 />
                 Phone
               </span>
-              <span class="font-medium text-slate-700">
+              <span class="font-medium text-slate-700 dark:text-slate-100">
                 {{ form.phone || "Not provided" }}
               </span>
             </div>
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-2 text-slate-500">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:clock-20-solid"
                   class="h-4 w-4 text-purple-500"
                 />
                 Last login
               </span>
-              <span class="font-medium text-slate-700">
+              <span class="font-medium text-slate-700 dark:text-slate-100">
                 {{ formattedLastLogin }}
               </span>
             </div>
@@ -291,7 +296,7 @@
 
           <div
             v-if="form.notes"
-            class="mt-5 rounded-xl bg-slate-50/80 p-4 text-sm text-slate-600"
+            class="mt-5 rounded-xl border border-slate-200/60 bg-white/70 p-4 text-sm text-slate-600 dark:border-slate-800/70 dark:bg-slate-900/50 dark:text-slate-300"
           >
             <p
               class="text-xs font-semibold uppercase tracking-wide text-slate-400"
@@ -304,12 +309,12 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="surface-card">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-700">
+            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-100">
               Recent activity
             </h3>
-            <span class="text-xs text-slate-400"
+            <span class="text-xs text-slate-400 dark:text-slate-500"
               >Last {{ activity.length }} events</span
             >
           </div>
@@ -317,22 +322,24 @@
             <li
               v-for="item in activity"
               :key="item.id"
-              class="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+              class="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 dark:border-slate-800/70 dark:bg-slate-900/50"
             >
               <span
                 class="mt-1 h-2.5 w-2.5 rounded-full"
                 :class="activityToneClass(item.tone)"
               ></span>
               <div>
-                <p class="text-sm font-medium text-slate-700">
+                <p class="text-sm font-medium text-slate-700 dark:text-slate-100">
                   {{ item.title }}
                 </p>
-                <p class="text-xs text-slate-500">{{ item.subtitle }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  {{ item.subtitle }}
+                </p>
               </div>
             </li>
             <li
               v-if="activity.length === 0"
-              class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500"
+              class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400"
             >
               No recorded activity for this user yet.
             </li>
@@ -525,8 +532,8 @@ const statusDescription = computed(() =>
 
 const statusBadgeClass = computed(() =>
   form.value.isActive
-    ? "border-emerald-200 bg-emerald-50 text-emerald-600"
-    : "border-slate-200 bg-slate-100 text-slate-500"
+    ? "border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-200"
+    : "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300"
 );
 
 const isDirty = computed(() => {

@@ -3,15 +3,15 @@
     <Heading title="Student Profile" link="/dashboard" buttonText="Back" />
 
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-      <section class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section class="surface-card space-y-6">
         <header class="flex flex-wrap items-start justify-between gap-4">
           <div class="space-y-1">
-            <p class="text-sm font-medium text-slate-500">Student ID</p>
-            <h1 class="text-2xl font-semibold text-slate-900">{{ profile.id }}</h1>
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Student ID</p>
+            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">{{ profile.id }}</h1>
           </div>
 
           <span
-            class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+            class="surface-pill inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold"
             :class="statusBadgeClass"
           >
             <Icon :icon="statusIcon" class="h-4 w-4" />
@@ -20,76 +20,76 @@
         </header>
 
         <div
-          class="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 sm:flex-row sm:items-center"
+          class="surface-panel flex flex-col gap-4 sm:flex-row sm:items-center"
         >
           <div
-            class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-xl font-semibold text-white shadow-lg"
+            class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-xl font-semibold text-white shadow-lg shadow-amber-500/20 dark:from-amber-500 dark:to-amber-400"
           >
             {{ initials }}
           </div>
           <div class="space-y-1">
-            <p class="text-lg font-semibold text-slate-900">{{ profile.name }}</p>
-            <p class="text-sm text-slate-500">{{ profile.program }}</p>
+            <p class="text-lg font-semibold text-slate-900 dark:text-white">{{ profile.name }}</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400">{{ profile.program }}</p>
           </div>
           <span
-            class="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600"
+            class="surface-pill ml-auto inline-flex items-center gap-2 text-xs font-medium"
           >
-            <Icon icon="heroicons:calendar-days-20-solid" class="h-4 w-4 text-amber-500" />
+            <Icon icon="heroicons:calendar-days-20-solid" class="h-4 w-4 text-amber-500 dark:text-amber-300" />
             Enrolled {{ profile.enrollmentYear }}
           </span>
         </div>
 
         <dl class="grid gap-4 sm:grid-cols-2">
-          <div class="rounded-xl border border-slate-100 bg-white/70 p-4 shadow-sm">
-            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Email</dt>
-            <dd class="mt-1 font-medium text-slate-700">{{ profile.email }}</dd>
+          <div class="surface-panel space-y-1">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Email</dt>
+            <dd class="mt-1 font-medium text-slate-700 dark:text-slate-100">{{ profile.email }}</dd>
           </div>
-          <div class="rounded-xl border border-slate-100 bg-white/70 p-4 shadow-sm">
-            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Advisor</dt>
-            <dd class="mt-1 font-medium text-slate-700">{{ profile.advisor }}</dd>
+          <div class="surface-panel space-y-1">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Advisor</dt>
+            <dd class="mt-1 font-medium text-slate-700 dark:text-slate-100">{{ profile.advisor }}</dd>
           </div>
-          <div class="rounded-xl border border-slate-100 bg-white/70 p-4 shadow-sm">
-            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Completed credits</dt>
-            <dd class="mt-1 font-medium text-slate-700">{{ profile.credits }} / 128</dd>
+          <div class="surface-panel space-y-1">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Completed credits</dt>
+            <dd class="mt-1 font-medium text-slate-700 dark:text-slate-100">{{ profile.credits }} / 128</dd>
           </div>
-          <div class="rounded-xl border border-slate-100 bg-white/70 p-4 shadow-sm">
-            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Cumulative GPA</dt>
-            <dd class="mt-1 flex items-center gap-2 font-semibold text-emerald-600">
+          <div class="surface-panel space-y-1">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Cumulative GPA</dt>
+            <dd class="mt-1 flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-300">
               {{ profile.gpa.toFixed(2) }}
-              <span class="text-xs font-medium text-slate-400">Target ≥ 3.5</span>
+              <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Target ≥ 3.5</span>
             </dd>
           </div>
         </dl>
 
         <section class="space-y-3">
-          <h2 class="text-sm font-semibold text-slate-700">About this student</h2>
-          <p class="text-sm leading-relaxed text-slate-600">
+          <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-200">About this student</h2>
+          <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             {{ profile.about }}
           </p>
         </section>
 
         <section class="space-y-3">
-          <h2 class="text-sm font-semibold text-slate-700">Recent achievements</h2>
+          <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-200">Recent achievements</h2>
           <ul class="space-y-2">
             <li
               v-for="achievement in profile.achievements"
               :key="achievement.id"
-              class="flex items-start gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-600"
+              class="surface-panel flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300"
             >
-              <Icon :icon="achievement.icon" class="mt-1 h-4 w-4 text-amber-500" />
+              <Icon :icon="achievement.icon" class="mt-1 h-4 w-4 text-amber-500 dark:text-amber-300" />
               <div>
-                <p class="font-medium text-slate-700">{{ achievement.title }}</p>
-                <p class="text-xs text-slate-500">{{ achievement.date }}</p>
+                <p class="font-medium text-slate-700 dark:text-slate-100">{{ achievement.title }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ achievement.date }}</p>
               </div>
             </li>
           </ul>
         </section>
       </section>
 
-      <section class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section class="surface-card space-y-6">
         <header class="space-y-1">
-          <h2 class="text-lg font-semibold text-slate-900">Update student profile</h2>
-          <p class="text-sm text-slate-500">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Update student profile</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">
             Edit core details and keep the academic record up to date.
           </p>
         </header>
@@ -188,19 +188,19 @@
               id="student-about"
               v-model="form.about"
               rows="5"
-              class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100"
+              class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-amber-400"
               placeholder="Add a short summary of the student's goals, strengths, or interests..."
               maxlength="400"
             ></textarea>
             <div class="text-xs">
-              <p v-if="errors.about" class="text-red-600">{{ errors.about }}</p>
-              <p v-else class="text-slate-500">{{ form.about.length }}/400 characters</p>
+              <p v-if="errors.about" class="text-red-600 dark:text-red-400">{{ errors.about }}</p>
+              <p v-else class="text-slate-500 dark:text-slate-400">{{ form.about.length }}/400 characters</p>
             </div>
           </div>
 
           <div
             v-if="successMessage"
-            class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+            class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-200"
           >
             <Icon icon="heroicons:check-circle-20-solid" class="mt-0.5 h-5 w-5" />
             <div>
@@ -213,7 +213,7 @@
             <button
               type="submit"
               :disabled="loading || !isDirty"
-              class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+              class="glass-button bg-amber-500/95 px-4 py-2.5 text-sm font-semibold shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span
                 v-if="loading"
@@ -224,7 +224,7 @@
 
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+              class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:border-amber-300 hover:text-amber-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:border-amber-400 dark:hover:text-amber-200"
               :disabled="!isDirty || loading"
               @click="resetForm"
             >
@@ -232,7 +232,7 @@
               Reset
             </button>
 
-            <span class="ml-auto text-xs text-slate-500">
+            <span class="ml-auto text-xs text-slate-500 dark:text-slate-400">
               Last updated {{ formattedUpdatedAt }}
             </span>
           </div>
@@ -362,15 +362,15 @@ const initials = computed(() =>
 const statusBadgeClass = computed(() => {
   switch (profile.value.status) {
     case "Active":
-      return "border border-emerald-200 bg-emerald-50 text-emerald-600";
+      return "border border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-400/50 dark:bg-emerald-400/15 dark:text-emerald-200";
     case "Leave":
-      return "border border-amber-200 bg-amber-50 text-amber-600";
+      return "border border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-400/50 dark:bg-amber-400/15 dark:text-amber-200";
     case "Probation":
-      return "border border-red-200 bg-red-50 text-red-600";
+      return "border border-red-200 bg-red-50 text-red-600 dark:border-red-400/50 dark:bg-red-400/15 dark:text-red-200";
     case "Graduated":
-      return "border border-sky-200 bg-sky-50 text-sky-600";
+      return "border border-sky-200 bg-sky-50 text-sky-600 dark:border-sky-400/50 dark:bg-sky-400/15 dark:text-sky-200";
     default:
-      return "border border-slate-200 bg-slate-50 text-slate-600";
+      return "border border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300";
   }
 });
 

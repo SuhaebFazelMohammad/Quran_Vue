@@ -1,11 +1,11 @@
 <template>
   <div
-    class="group relative flex flex-col gap-y-1 text-slate-700"
+    class="group relative flex flex-col gap-y-1 text-slate-700 dark:text-slate-200"
     :class="attrs.class"
   >
     <label class="sr-only" :for="inputId">{{ placeholder || "Search" }}</label>
     <div
-      class="flex items-center gap-x-2 rounded-2xl border border-amber-200 bg-white/80 px-3 py-2 shadow-sm backdrop-blur-sm transition-all duration-200 group-focus-within:-translate-y-px group-focus-within:border-amber-300 group-focus-within:shadow-lg group-focus-within:shadow-amber-100/60"
+      class="flex items-center gap-x-2 rounded-2xl border border-amber-200 bg-white/80 px-3 py-2 text-slate-700 shadow-sm backdrop-blur-sm transition-all duration-200 group-focus-within:-translate-y-px group-focus-within:border-amber-300 group-focus-within:shadow-lg group-focus-within:shadow-amber-100/60 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:group-focus-within:border-amber-400/70 dark:group-focus-within:shadow-black/40"
     >
       <Icon
         icon="heroicons:magnifying-glass-20-solid"
@@ -16,7 +16,7 @@
         :id="inputId"
         ref="inputRef"
         type="text"
-        class="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+        class="w-full bg-transparent text-sm outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
         :placeholder="placeholder"
         :value="modelValue"
         @input="onInput"
@@ -28,7 +28,7 @@
         <button
           v-if="hasValue"
           type="button"
-          class="rounded-md bg-amber-100/80 p-1 text-amber-600 transition hover:bg-amber-200"
+          class="rounded-md bg-amber-100/80 p-1 text-amber-600 transition hover:bg-amber-200 dark:bg-amber-400/20 dark:text-amber-200 dark:hover:bg-amber-400/30"
           @click="clear"
           aria-label="Clear search"
         >
@@ -39,7 +39,7 @@
     <transition name="scale">
       <div
         v-if="showHint"
-        class="absolute left-0 right-0 top-full mt-1 origin-top overflow-hidden rounded-xl border border-amber-100 bg-white/95 p-3 text-xs text-slate-500 shadow-lg shadow-amber-100/50"
+        class="absolute left-0 right-0 top-full mt-1 origin-top overflow-hidden rounded-xl border border-amber-100 bg-white/95 p-3 text-xs text-slate-500 shadow-lg shadow-amber-100/50 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-300 dark:shadow-black/40"
       >
         <p class="flex items-start gap-x-2 leading-snug">
           <Icon

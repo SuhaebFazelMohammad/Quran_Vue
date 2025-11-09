@@ -1,14 +1,18 @@
 <template>
-  <div class="w-full" ref="root">
+  <div class="w-full z-50" ref="root">
     <label
       v-if="label"
       :for="buttonId"
-      class="mb-1.5 block text-sm font-medium text-slate-700"
+      class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
       >{{ label }}</label
     >
 
     <div
-      :class="['relative', disabled ? 'opacity-60 pointer-events-none' : '']"
+      :class="[
+        'relative',
+        disabled ? 'opacity-60 pointer-events-none' : '',
+        open ? 'z-40' : '',
+      ]"
     >
       <button
         :id="buttonId"
@@ -26,19 +30,21 @@
       >
         <div class="flex min-w-0 flex-1 items-center gap-3">
           <span
-            class="inline-flex size-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition group-hover:bg-amber-200"
+            class="inline-flex size-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition group-hover:bg-amber-200  dark:bg-amber-400/20 dark:text-amber-200 dark:group-hover:bg-amber-400"
           >
             <Icon :icon="icon" class="h-4 w-4" />
           </span>
 
           <div class="flex min-w-0 flex-1 flex-col text-left">
             <span
-              class="truncate text-sm font-semibold text-slate-800"
-              :class="selectedOption ? '' : 'text-slate-500'"
+              class="truncate text-sm font-semibold text-slate-800 dark:text-slate-100"
+              :class="
+                selectedOption ? '' : 'text-slate-500 dark:text-slate-400'
+              "
             >
               {{ selectedOption ? selectedOptionLabel : placeholder }}
             </span>
-            <span class="truncate text-xs text-slate-400">
+            <span class="truncate text-xs text-slate-400 dark:text-slate-500">
               {{ hintText }}
             </span>
           </div>
@@ -48,7 +54,7 @@
           <button
             v-if="clearable && selectedOption"
             type="button"
-            class="rounded-full bg-slate-100 p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700"
+            class="rounded-full bg-slate-100 p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
             @click.stop="clear()"
             aria-label="Clear selection"
           >
@@ -57,7 +63,7 @@
           <Icon
             icon="heroicons:chevron-down-20-solid"
             :class="[
-              'h-4 w-4 text-slate-400 transition',
+              'h-4 w-4 text-slate-400 transition dark:text-slate-500',
               open ? 'rotate-180' : '',
             ]"
           />
@@ -67,20 +73,23 @@
       <transition name="fade">
         <div
           v-if="open"
-          class="absolute z-50 mt-2 w-full rounded-2xl border border-slate-200 bg-white shadow-xl"
+          class="absolute z-50 mt-2 w-full rounded-2xl border border-amber-100/50 bg-white/98 shadow-md overflow-hidden shadow-amber-200/25 backdrop-blur-md ring-1 ring-amber-100/40 dark:border-slate-700/60 dark:bg-slate-950/95 dark:shadow-lg dark:shadow-black/50 dark:ring-slate-700/60"
         >
-          <div v-if="searchable" class="border-b border-slate-200 p-2">
+          <div
+            v-if="searchable"
+            class="border-b border-slate-200 p-2 dark:border-slate-800"
+          >
             <div
-              class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3"
+              class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 dark:border-slate-700 dark:bg-slate-900/60"
             >
               <Icon
                 icon="heroicons:magnifying-glass-20-solid"
-                class="h-4 w-4 text-slate-400"
+                class="h-4 w-4 text-slate-400 dark:text-slate-500"
               />
               <input
                 v-model="query"
                 type="text"
-                class="h-9 flex-1 bg-transparent text-sm text-slate-700 outline-none"
+                class="h-9 flex-1 bg-transparent text-sm text-slate-700 outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
                 placeholder="Search options..."
                 @keydown.down.prevent="onArrow(1)"
                 @keydown.up.prevent="onArrow(-1)"
@@ -95,7 +104,10 @@
             role="listbox"
             class="max-h-64 overflow-auto py-2"
           >
-            <li v-if="loading" class="px-4 py-8 text-center text-slate-500">
+            <li
+              v-if="loading"
+              class="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
+            >
               <span
                 class="mr-2 inline-block h-5 w-5 animate-spin rounded-full border-2 border-amber-500/60 border-r-transparent align-middle"
               ></span>
@@ -104,7 +116,7 @@
 
             <li
               v-else-if="filteredOptions.length === 0"
-              class="px-4 py-8 text-center text-slate-500"
+              class="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
             >
               {{ emptyText }}
             </li>
@@ -120,12 +132,13 @@
               @click="select(opt)"
             >
               <div class="flex items-center gap-3">
-                <span class="text-sm font-medium text-slate-700">{{
-                  renderLabel(opt)
-                }}</span>
+                <span
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >{{ renderLabel(opt) }}</span
+                >
                 <span
                   v-if="opt.description"
-                  class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500"
+                  class="rounded-full bg-slate-100/80 px-2 py-0.5 text-xs text-slate-500 dark:bg-slate-800/70 dark:text-slate-300"
                 >
                   {{ opt.description }}
                 </span>
@@ -133,7 +146,7 @@
               <Icon
                 v-if="isSelected(opt)"
                 icon="heroicons:check-20-solid"
-                class="h-4 w-4 text-amber-500"
+                class="h-4 w-4 text-amber-500 dark:text-amber-300"
               />
             </li>
           </ul>
@@ -141,7 +154,9 @@
       </transition>
     </div>
 
-    <p v-if="hint" class="mt-2 text-xs text-slate-500">{{ hint }}</p>
+    <p v-if="hint" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+      {{ hint }}
+    </p>
   </div>
 </template>
 
@@ -233,8 +248,10 @@ const filteredOptions = computed(() => {
 });
 
 const buttonClasses = computed(() => [
-  "border-slate-200 bg-slate-50 text-slate-700 focus-visible:ring-amber-100 hover:bg-white hover:border-amber-300",
-  open.value ? "border-amber-300 bg-white" : "",
+  "border-slate-200 bg-slate-50 text-slate-700 focus-visible:ring-amber-100 hover:bg-white hover:border-amber-300 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-amber-400/70 dark:hover:bg-slate-900/40",
+  open.value
+    ? "border-amber-300 bg-white shadow-md shadow-amber-200/25 dark:border-amber-400/70 dark:bg-slate-900/50 dark:shadow-md dark:shadow-black/40"
+    : "",
 ]);
 
 function optionClasses(option: FilterOption, index: number) {
@@ -244,8 +261,10 @@ function optionClasses(option: FilterOption, index: number) {
 
   return [
     base,
-    highlighted ? "bg-amber-50" : "",
-    selected ? "text-amber-700 font-semibold" : "text-slate-700",
+    highlighted ? "bg-amber-500/12 dark:bg-amber-400/15" : "",
+    selected
+      ? "text-amber-700 font-semibold dark:text-amber-200"
+      : "text-slate-700 dark:text-slate-200",
     option.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
   ];
 }

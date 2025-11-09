@@ -2,35 +2,35 @@
   <div
     v-bind="passthroughAttrs"
     :class="[
-      'flex items-center justify-between text-sm text-slate-600',
+      'flex items-center justify-between text-sm text-slate-600 dark:text-slate-300',
       rootClass,
     ]"
   >
-    <div class="text-slate-500">
+    <div class="text-slate-500 dark:text-slate-400">
       Showing
-      <span class="font-medium text-slate-700">{{ displayStart }}</span>
+      <span class="font-medium text-slate-700 dark:text-slate-200">{{ displayStart }}</span>
       to
-      <span class="font-medium text-slate-700">{{ displayEnd }}</span>
+      <span class="font-medium text-slate-700 dark:text-slate-200">{{ displayEnd }}</span>
       of
-      <span class="font-medium text-slate-700">{{ total }}</span>
+      <span class="font-medium text-slate-700 dark:text-slate-200">{{ total }}</span>
       entries
     </div>
     <div class="flex items-center gap-2">
       <button
         type="button"
-        class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="rounded-xl border border-slate-200/70 px-3 py-1.5 text-slate-700 transition hover:bg-slate-100/70 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/70"
         :disabled="isFirstPage"
         @click="goTo(page - 1)"
         aria-label="Go to previous page"
       >
         Prev
       </button>
-      <span class="px-2 text-slate-600"
+      <span class="px-2 text-slate-600 dark:text-slate-400"
         >Page {{ page }} / {{ totalPages }}</span
       >
       <button
         type="button"
-        class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="rounded-xl border border-slate-200/70 px-3 py-1.5 text-slate-700 transition hover:bg-slate-100/70 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/70"
         :disabled="isLastPage"
         @click="goTo(page + 1)"
         aria-label="Go to next page"

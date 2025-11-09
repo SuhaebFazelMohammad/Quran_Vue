@@ -1,7 +1,7 @@
 <template>
-    <div class="fixed inset-0 z-50 grid place-items-center bg-white/60 rounded-xl">
+    <div class="absolute inset-0 z-50 grid place-items-center rounded-2xl bg-white/70 backdrop-blur-sm dark:bg-slate-950/60">
         <span
-        class="inline-block w-5 h-5 border-2 border-amber-500/60 border-r-transparent rounded-full animate-spin"
+        class="inline-block h-6 w-6 rounded-full border-2 border-amber-500/70 border-r-transparent animate-spin"
         ></span> 
     </div>
 </template>
