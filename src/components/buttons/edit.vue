@@ -1,6 +1,6 @@
 <template>
-  <button
-    type="button"
+  <RouterLink
+    :to="to"
     class="inline-flex items-center gap-2 rounded-lg border border-emerald-200/60 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-600 transition hover:bg-emerald-100 hover:border-emerald-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
     :disabled="disabled || loading"
     @click="handleClick"
@@ -17,7 +17,7 @@
       ></span>
     </span>
     <slot>Edit</slot>
-  </button>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
@@ -27,10 +27,12 @@ const props = withDefaults(
   defineProps<{
     disabled?: boolean;
     loading?: boolean;
+    to: string;
   }>(),
   {
     disabled: false,
     loading: false,
+    to: "/",
   }
 );
 

@@ -1,15 +1,6 @@
 <template>
   <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-base font-semibold text-slate-800">Create User</h1>
-      <RouterLink
-        to="/users"
-        class="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium hover:brightness-105 active:translate-y-px transition"
-      >
-        <Icon icon="heroicons:arrow-left-20-solid" class="w-4 h-4" />
-        Back
-      </RouterLink>
-    </div>
+    <Heading title="Create User" link="/users" buttonText="Back" />
 
     <form @submit.prevent="handleSubmit" class="max-w-2xl space-y-5">
       <Text
@@ -85,6 +76,7 @@
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
 import Text from "../../../components/input/text.vue";
+import Heading from "../../../components/heading.vue";
 
 const loading = ref(false);
 

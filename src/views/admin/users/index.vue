@@ -1,12 +1,7 @@
 <template>
   <div class="space-y-4">
     <div class="flex flex-col gap-y-3">
-      <h1 class="text-base font-semibold text-slate-800">Users</h1>
-      <div class="flex items-center gap-2">
-        <SelectFilter :options="roleFilterOptions" v-model="selectedRole" :clearable="true" :searchable="false" class="w-40" placeholder="Filter by role" />
-        <SelectFilter :options="roleFilterOptions" v-model="selectedRole" :clearable="true" :searchable="false" class="w-40" placeholder="Filter by role" />
-        <SelectFilter :options="roleFilterOptions" v-model="selectedRole" :clearable="true" :searchable="false" class="w-40" placeholder="Filter by role" />
-      </div>
+      <Heading title="Users" link="/users/create" buttonText="Add User" />
       <div class="flex justify-between items-center gap-3">
         <div class="flex items-center gap-2 text-sm text-slate-600">
           <span>Show</span>
@@ -19,12 +14,14 @@
           />
           <span>rows</span>
         </div>
-        <RouterLink
-          to="/users/create"
-          class="px-3 py-2 rounded-lg bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
-        >
-          Add User
-        </RouterLink>
+        <SelectFilter
+          :options="roleFilterOptions"
+          v-model="selectedRole"
+          :clearable="true"
+          :searchable="false"
+          class="w-40"
+          placeholder="Filter by role"
+        />
       </div>
     </div>
 
@@ -51,7 +48,8 @@
       <!-- Example: custom actions cell -->
       <template #cell-actions="{ row }">
         <div class="flex items-center gap-2">
-          <EditButton class="text-xs" @click="handleEdit(row)" />
+          <ShowButton :to="`/users/${row.id}`" />
+          <EditButton :to="`/users/${row.id}/edit`" />
           <DeleteButton
             class="text-xs"
             :confirm-message="`Are you sure you want to delete ${row.name}?`"
@@ -65,14 +63,15 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import SelectInput from "../../../components/input/select.vue";
 import { storeToRefs } from "pinia";
 import Table, { type TableColumn } from "../../../components/table.vue";
 import Select from "../../../components/input/select.vue";
 import { useSearchStore } from "../../../stores/search";
 import DeleteButton from "../../../components/buttons/delete.vue";
 import EditButton from "../../../components/buttons/edit.vue";
+import ShowButton from "../../../components/buttons/show.vue";
 import SelectFilter from "../../../components/input/selectFilter.vue";
+import Heading from "../../../components/heading.vue";
 
 const loading = ref(false);
 const page = ref(1);
@@ -201,10 +200,5 @@ function onSortChange(payload: { key: string; direction: "asc" | "desc" }) {
 function handleDelete(row: any) {
   // Replace with API call / mutation once backend is connected
   console.log("delete", row);
-}
-
-function handleEdit(row: any) {
-  // Replace with navigation or modal invocation when ready
-  console.log("edit", row);
 }
 </script>
