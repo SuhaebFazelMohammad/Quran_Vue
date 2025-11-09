@@ -13,12 +13,6 @@
         class="surface-card border border-slate-700/60 bg-slate-950/80 px-8 py-10 shadow-2xl shadow-black/50"
       >
         <div class="flex flex-col items-center gap-3 mb-6 text-center">
-          <span
-            class="surface-pill border-amber-400/40 bg-amber-500/10 text-amber-200"
-          >
-            <Icon icon="heroicons:sparkles-20-solid" class="h-4 w-4" />
-            Quran Admin
-          </span>
           <h1 class="m-0 text-2xl font-semibold text-white tracking-tight">
             Welcome back
           </h1>
