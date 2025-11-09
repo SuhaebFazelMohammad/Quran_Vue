@@ -45,12 +45,12 @@
       >
         <Icon icon="heroicons:moon-20-solid" class="w-5 h-5" />
       </button>
-      <button
-        type="button"
+      <RouterLink
+        to="/users/profile"
         class="rounded-lg cursor-pointer px-2 py-1 bg-amber-500 text-white text-sm hover:brightness-105 active:translate-y-px"
       >
         <Icon icon="heroicons:user-20-solid" class="w-5 h-5" />
-      </button>
+      </RouterLink>
     </div>
   </header>
 </template>

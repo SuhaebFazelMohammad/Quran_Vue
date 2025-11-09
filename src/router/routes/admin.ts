@@ -4,6 +4,7 @@ import Users from "../../views/admin/users/index.vue";
 import UsersCreate from '../../views/admin/users/create.vue'
 import UsersEdit from '../../views/admin/users/edit.vue'
 import UsersShow from '../../views/admin/users/show.vue'
+import UsersProfile from '../../views/admin/profile.vue'
 
 const AdminRouter: RouteRecordRaw[] = [
   {
@@ -48,6 +49,15 @@ const AdminRouter: RouteRecordRaw[] = [
     component: UsersShow,
     meta: {
       title: "Show User",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/users/profile",
+    name: "users-profile",
+    component: UsersProfile,
+    meta: {
+      title: "Profile",
       requiresAuth: true,
     },
   }
