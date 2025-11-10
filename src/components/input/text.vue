@@ -35,9 +35,9 @@
         class="w-full rounded-xl border px-3 py-2.5 bg-white text-slate-800 placeholder:text-slate-400 transition focus:outline-none dark:bg-slate-950/60 dark:text-slate-100 dark:placeholder:text-slate-500"
         :class="[
           error
-            ? 'border-red-300 ring-4 ring-red-100 focus:border-red-400 focus:ring-red-200'
+            ? 'border-red-300 ring-4 dark:ring-2 ring-red-100 focus:border-red-400 focus:ring-red-200'
             : focused
-            ? 'border-amber-300 ring-4 ring-amber-100 focus:border-amber-400 focus:ring-amber-200 dark:border-amber-400/70 dark:ring-amber-400/10'
+            ? 'border-amber-300 ring-4 dark:ring-2 ring-amber-100 focus:border-amber-400 focus:ring-amber-200 dark:border-amber-400/70 dark:ring-amber-400/10'
             : 'border-slate-200 hover:bg-slate-50 focus:border-amber-300 focus:ring-4 focus:ring-amber-100 dark:border-slate-700 dark:hover:bg-slate-900/60 dark:focus:border-amber-400',
           iconLeft ? 'pl-10' : '',
           iconRight || clearable ? 'pr-10' : '',

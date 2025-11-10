@@ -1,10 +1,13 @@
 import type { RouteRecordRaw } from "vue-router";
 import Dashboard from "../../views/admin/dashboard.vue";
 import Users from "../../views/admin/users/index.vue";
-import UsersCreate from '../../views/admin/users/create.vue'
-import UsersEdit from '../../views/admin/users/edit.vue'
-import UsersShow from '../../views/admin/users/show.vue'
-import UsersProfile from '../../views/admin/profile.vue'
+import UsersCreate from "../../views/admin/users/create.vue";
+import UsersEdit from "../../views/admin/users/edit.vue";
+import UsersShow from "../../views/admin/users/show.vue";
+import UsersProfile from "../../views/admin/profile.vue";
+import Course from "../../views/admin/course/index.vue";
+import CourseEdit from "../../views/admin/course/edit.vue";
+import CourseShow from "../../views/admin/course/show.vue";
 
 const AdminRouter: RouteRecordRaw[] = [
   {
@@ -60,7 +63,34 @@ const AdminRouter: RouteRecordRaw[] = [
       title: "Profile",
       requiresAuth: true,
     },
-  }
+  },
+  {
+    path: "/course",
+    name: "course",
+    component: Course,
+    meta: {
+      title: "Course",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/course/:id(\\d+)/edit",
+    name: "course-edit",
+    component: CourseEdit,
+    meta: {
+      title: "Edit Course",
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/course/:id(\\d+)",
+    name: "course-show",
+    component: CourseShow,
+    meta: {
+      title: "Show Course",
+      requiresAuth: true,
+    },
+  },
 ];
 
 export default AdminRouter;

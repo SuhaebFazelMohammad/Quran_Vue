@@ -31,6 +31,20 @@
         <Icon icon="heroicons:users-20-solid" class="w-4 h-4" />
         <span v-if="isSidebarOpen">Users</span>
       </RouterLink>
+
+      <RouterLink
+        to="/course"
+        :class="[
+          'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
+          isSidebarOpen ? 'justify-start' : 'justify-center',
+          isActive('/course')
+            ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
+            : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
+        ]"
+      >
+        <Icon icon="heroicons:book-open-20-solid" class="w-4 h-4" />
+        <span v-if="isSidebarOpen">Course</span>
+      </RouterLink>
     </nav>
 
     <div class="mt-auto border-t border-slate-200/70 p-4 dark:border-slate-800/60">
