@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full z-50" ref="root">
+  <div class="w-full" ref="root">
     <label
       v-if="label"
       :for="buttonId"
