@@ -61,7 +61,9 @@
       </RouterLink>
     </nav>
 
-    <div class="mt-auto border-t border-slate-200/70 p-4 dark:border-slate-800/60">
+    <div
+      class="mt-auto border-t border-slate-200/70 p-4 dark:border-slate-800/60"
+    >
       <button
         type="button"
         class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200/70 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100/70 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/40 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/70"
@@ -81,10 +83,12 @@
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { Icon } from "@iconify/vue";
 import { useSidebarStore } from "../stores/sidebar";
+import { useUserStore } from "../stores/userStore";
 import { computed } from "vue";
 
 const sidebarStore = useSidebarStore();
 const isSidebarOpen = computed(() => sidebarStore.isOpen);
+const userStore = useUserStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -93,7 +97,9 @@ function isActive(path: string) {
   return route.path === path;
 }
 
-function logout() {
-  router.push("/login");
+async function logout() {
+  await userStore.logout();
+  // Navigate to login page and replace current history entry
+  await router.replace({ name: "login" });
 }
 </script>

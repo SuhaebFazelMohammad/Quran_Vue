@@ -23,24 +23,24 @@
 
         <form class="grid gap-4" @submit.prevent="onSubmit">
           <div class="grid gap-2 text-left">
-            <label for="email" class="text-sm font-medium text-slate-300"
-              >Email</label
+            <label for="login" class="text-sm font-medium text-slate-300"
+              >Login</label
             >
             <input
-              id="email"
-              type="email"
-              v-model.trim="form.email"
-              placeholder="you@example.com"
-              autocomplete="email"
+              id="login"
+              type="text"
+              v-model.trim="form.login"
+              placeholder="Email or username"
+              autocomplete="username"
               :class="[
                 'w-full rounded-xl border bg-slate-900/70 px-3 py-3 outline-none text-slate-100 placeholder:text-slate-500 transition focus:ring-4',
-                errors.email
+                errors.login
                   ? 'border-red-500/80 ring-0 focus:ring-red-500/20'
                   : 'border-slate-700/70 focus:border-amber-400 focus:ring-amber-400/20',
               ]"
             />
-            <p v-if="errors.email" class="m-0 text-xs text-red-300">
-              {{ errors.email }}
+            <p v-if="errors.login" class="m-0 text-xs text-red-300">
+              {{ errors.login }}
             </p>
           </div>
 
@@ -107,42 +107,42 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "../../stores/userStore";
 
 interface LoginFormState {
-  email: string;
+  login: string;
   password: string;
   remember: boolean;
 }
 
 const form = reactive<LoginFormState>({
-  email: "",
+  login: "",
   password: "",
   remember: true,
 });
 
-const errors = reactive<{ email: string | null; password: string | null }>({
-  email: null,
+const errors = reactive<{ login: string | null; password: string | null }>({
+  login: null,
   password: null,
 });
 
 const showPassword = ref(false);
-const loading = ref(false);
 const serverMessage = ref("");
 const serverMessageType = ref<"success" | "error">("success");
 const router = useRouter();
+const userStore = useUserStore();
+
+const loading = computed(() => userStore.loading);
 
 function validate(): boolean {
-  errors.email = null;
+  errors.login = null;
   errors.password = null;
 
   let ok = true;
-  if (!form.email) {
-    errors.email = "Email is required";
-    ok = false;
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = "Enter a valid email address";
+  if (!form.login) {
+    errors.login = "Login is required";
     ok = false;
   }
 
@@ -161,9 +161,22 @@ async function onSubmit() {
   serverMessage.value = "";
   if (!validate()) return;
 
-  loading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  router.push({ name: "dashboard" });
-  loading.value = false;
+  const result = await userStore.login({
+    login: form.login,
+    password: form.password,
+    remember: form.remember,
+  });
+
+  if (result.success) {
+    serverMessage.value = "Login successful! Redirecting...";
+    serverMessageType.value = "success";
+
+    // Redirect to intended page or dashboard
+    const redirect = router.currentRoute.value.query.redirect as string;
+    router.push(redirect || { name: "dashboard" });
+  } else {
+    serverMessage.value = result.message || "Login failed. Please try again.";
+    serverMessageType.value = "error";
+  }
 }
 </script>

@@ -2,11 +2,17 @@ import type { RouteRecordRaw } from "vue-router";
 
 import Login from "../../views/auth/login.vue";
 import NotFound from "../../views/errors/not-found.vue";
+import Home from "../../views/guest/home.vue";
 
 const guestRoutes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: "/dashboard",
+    name: "home",
+    component: Home,
+    meta: {
+      title: "Home",
+      requiresAuth: false,
+    },
   },
   {
     path: "/login",
