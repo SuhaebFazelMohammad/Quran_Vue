@@ -1,11 +1,27 @@
 <template>
   <div class="space-y-6">
-    <Heading title="Create Course Type" link="/course-type" buttonText="Back" />
+    <Heading
+      title="Create Course Type"
+      link="/admin/course-type"
+      buttonText="Back"
+    />
 
     <form
       @submit.prevent="handleSubmit"
-      class="surface-card max-w-2xl space-y-5"
+      class="surface-card w-full space-y-6"
+      novalidate
     >
+      <SuccessMessage
+        v-if="successMessage"
+        :title="successMessage"
+        message="The course type has been created successfully."
+      />
+
+      <ErrorMessage
+        v-if="errorMessage"
+        :title="errorMessage"
+        message="Please check the form and try again."
+      />
       <Text
         id="name"
         v-model="form.name"
@@ -17,23 +33,13 @@
         required
       />
 
-      <Text
-        id="level"
-        v-model="form.level"
-        label="Level"
-        placeholder="Enter level (e.g. Beginner, Advanced)"
-        icon-left="heroicons:adjustments-horizontal-20-solid"
-        :error="errors.level"
-        clearable
-      />
-
       <Image
-        id="image"
-        v-model="form.image"
-        label="Image"
-        placeholder="Upload image"
+        id="icon"
+        v-model="form.icon"
+        label="Icon"
+        placeholder="Upload icon image"
         icon-left="heroicons:photo-20-solid"
-        :error="errors.image"
+        :error="errors.icon"
         clearable
       />
 
@@ -47,7 +53,7 @@
           <span v-else>Create Type</span>
         </button>
         <RouterLink
-          to="/course-type"
+          to="/admin/course-type"
           class="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:border-amber-300 hover:text-amber-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-amber-400 dark:hover:text-amber-200"
         >
           Cancel
@@ -65,20 +71,22 @@ import Heading from "../../../components/heading.vue";
 import Image from "../../../components/input/image.vue";
 
 const loading = ref(false);
+const successMessage = ref<string | null>(null);
+const errorMessage = ref<string | null>(null);
 
 const form = ref({
   name: "",
-  level: "",
-  description: "",
-  image: "",
+  icon: null as File | null,
 });
 
 const errors = ref<{
   name?: string;
-  level?: string;
-  description?: string;
-  image?: string;
+  icon?: string;
 }>({});
+
+import { createTypeCourse } from "../../../api/type-courses";
+import SuccessMessage from "../../../components/message/success.vue";
+import ErrorMessage from "../../../components/message/error.vue";
 
 function validateForm() {
   errors.value = {};
@@ -87,27 +95,53 @@ function validateForm() {
     errors.value.name = "Name is required";
   }
 
-  if (form.value.level && !/^[a-zA-Z\s]+$/.test(form.value.level)) {
-    errors.value.level = "Level should contain only letters";
-  }
-
-  if (form.value.description && form.value.description.length < 10) {
-    errors.value.description = "Description should be at least 10 characters";
-  }
-
   return Object.keys(errors.value).length === 0;
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!validateForm()) {
     return;
   }
 
   loading.value = true;
+  errors.value = {};
 
-  setTimeout(() => {
-    console.log("Creating course type:", form.value);
+  try {
+    await createTypeCourse({
+      name: form.value.name,
+      icon: form.value.icon || undefined,
+    });
+
+    successMessage.value = "Course type created successfully";
+
+    form.value = {
+      name: "",
+      icon: null,
+    };
+  } catch (error: any) {
+    console.error("Failed to create course type", error);
+
+    if (error?.response?.data?.errors) {
+      const backendErrors = error.response.data.errors;
+      const mappedErrors: any = {};
+
+      Object.keys(backendErrors).forEach((key) => {
+        if (key in form.value) {
+          mappedErrors[key] = Array.isArray(backendErrors[key])
+            ? backendErrors[key][0]
+            : backendErrors[key];
+        }
+      });
+
+      errors.value = mappedErrors;
+    }
+
+    errorMessage.value =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to create course type. Please try again.";
+  } finally {
     loading.value = false;
-  }, 1000);
+  }
 }
 </script>

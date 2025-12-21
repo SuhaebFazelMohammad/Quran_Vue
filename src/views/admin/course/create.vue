@@ -1,44 +1,16 @@
 <template>
   <div class="space-y-6">
-    <Heading title="Edit Course" link="/admin/course" buttonText="Back" />
-
-    <div v-if="loading && !course" class="surface-card relative min-h-[400px]">
-      <Loading />
-    </div>
-
-    <div v-else-if="notFound" class="surface-card p-8 text-center">
-      <div
-        class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600"
-      >
-        <Icon icon="heroicons:exclamation-triangle-20-solid" class="h-6 w-6" />
-      </div>
-      <h2 class="mt-4 text-lg font-semibold text-slate-800">
-        Course not found
-      </h2>
-      <p class="mt-2 text-sm text-slate-500">
-        The course you are looking for does not exist or was removed.
-      </p>
-      <RouterLink
-        to="/admin/course"
-        class="mt-5 inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-105 active:translate-y-px"
-      >
-        <Icon icon="heroicons:arrow-uturn-left-20-solid" class="h-4 w-4" />
-        Back to Courses
-      </RouterLink>
-    </div>
+    <Heading title="Create Course" link="/admin/course" buttonText="Back" />
 
     <form
-      v-else
       @submit.prevent="handleSubmit"
       class="surface-card w-full space-y-6"
       novalidate
     >
-      <Loading v-if="submitting" />
-
       <SuccessMessage
         v-if="successMessage"
         :title="successMessage"
-        message="The course has been updated successfully."
+        message="The course has been created successfully."
       />
 
       <ErrorMessage
@@ -151,14 +123,11 @@
       <div class="flex items-center gap-3 pt-2">
         <button
           type="submit"
-          :disabled="submitting || !isDirty"
+          :disabled="loading"
           class="glass-button bg-amber-500/95 px-4 py-2.5 text-sm font-semibold shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <span
-            v-if="submitting"
-            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/60 border-r-transparent"
-          ></span>
-          <span v-else>Save Changes</span>
+          <span v-if="loading">Creating...</span>
+          <span v-else>Create Course</span>
         </button>
         <RouterLink
           to="/admin/course"
@@ -172,44 +141,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import { RouterLink, useRoute } from "vue-router";
-import { Icon } from "@iconify/vue";
+import { onMounted, ref, watch } from "vue";
+import { RouterLink } from "vue-router";
 import Text from "../../../components/input/text.vue";
 import Textarea from "../../../components/input/textarea.vue";
 import Select from "../../../components/input/select.vue";
 import SearchSelect from "../../../components/input/search-select.vue";
 import DateInput from "../../../components/input/date.vue";
+import { Icon } from "@iconify/vue";
 import Heading from "../../../components/heading.vue";
-import Loading from "../../../components/loading.vue";
 import SuccessMessage from "../../../components/message/success.vue";
 import ErrorMessage from "../../../components/message/error.vue";
-import { getCourse, updateCourse, type Course } from "../../../api/courses";
+import { createCourse } from "../../../api/courses";
 import { getTypeCourses } from "../../../api/type-courses";
 import type { TypeCourse } from "../../../api/type-courses";
 import { getUsers } from "../../../api/users";
 import type { User } from "../../../api/users";
 
-const route = useRoute();
 const loading = ref(false);
-const submitting = ref(false);
-const notFound = ref(false);
-const course = ref<Course | null>(null);
 const successMessage = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
 const courseTypes = ref<TypeCourse[]>([]);
 const users = ref<User[]>([]);
 
 const form = ref({
-  type_id: null as number | null,
-  user_id: null as number | null,
-  phone_num: "[]", // JSON array string
-  address: "",
-  description: "",
-  date: "",
-});
-
-const initialForm = ref({
   type_id: null as number | null,
   user_id: null as number | null,
   phone_num: "[]", // JSON array string
@@ -259,107 +214,19 @@ watch(
   { deep: true }
 );
 
-const isDirty = computed(() => {
-  return (
-    form.value.type_id !== initialForm.value.type_id ||
-    form.value.user_id !== initialForm.value.user_id ||
-    form.value.phone_num !== initialForm.value.phone_num ||
-    form.value.address !== initialForm.value.address ||
-    form.value.description !== initialForm.value.description ||
-    form.value.date !== initialForm.value.date
-  );
-});
-
-async function loadCourse() {
-  const id = Number(route.params.id);
-  if (!id) {
-    notFound.value = true;
-    return;
-  }
-
-  loading.value = true;
+onMounted(async () => {
   try {
-    course.value = await getCourse(id);
-    if (course.value) {
-      const typeId = Number(course.value.type_id);
-      const userId = course.value.user_id?.user?.id
-        ? Number(course.value.user_id.user.id)
-        : null;
-
-      // Ensure options are loaded before setting form values
-      if (courseTypeOptions.value.length === 0) {
-        await loadTypeOptions();
-      }
-      if (userOptions.value.length === 0) {
-        await loadUserOptions();
-      }
-
-      // Parse phone_num - if it's already a JSON string, use it; otherwise convert to JSON array
-      let phoneNum = course.value.phone_num || "";
-      if (phoneNum && !phoneNum.startsWith("[")) {
-        // If it's a single string, convert to JSON array
-        phoneNum = JSON.stringify([phoneNum]);
-      } else if (!phoneNum) {
-        phoneNum = "[]";
-      }
-
-      // Parse phone numbers array for the UI
-      try {
-        const phones = JSON.parse(phoneNum || "[]");
-        phoneNumbers.value =
-          Array.isArray(phones) && phones.length > 0 ? phones : [""];
-      } catch {
-        phoneNumbers.value = [""];
-      }
-
-      form.value = {
-        type_id: typeId || null,
-        user_id: userId,
-        phone_num: phoneNum,
-        address: course.value.address || "",
-        description: course.value.description || "",
-        date: course.value.date || "",
-      };
-      initialForm.value = { ...form.value };
-
-      // Debug: Check if type_id matches any option
-      const typeOption = courseTypeOptions.value.find(
-        (opt) => opt.value === typeId
-      );
-      if (!typeOption && typeId) {
-        console.warn(
-          `Course type_id ${typeId} not found in options:`,
-          courseTypeOptions.value
-        );
-      }
-    }
-  } catch (error: any) {
-    console.error("Failed to load course", error);
-    if (error?.response?.status === 404) {
-      notFound.value = true;
-    }
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function loadTypeOptions() {
-  try {
-    const response = await getTypeCourses({ show: 100 });
-    courseTypes.value = response.data || [];
+    // Load course types
+    const typeResponse = await getTypeCourses({ show: 100 });
+    courseTypes.value = typeResponse.data || [];
     courseTypeOptions.value = courseTypes.value.map((type) => ({
       value: type.id,
       label: type.name,
     }));
-  } catch (error) {
-    console.error("Failed to load course types", error);
-  }
-}
 
-async function loadUserOptions() {
-  try {
-    const response = await getUsers({ show: 100 });
-    users.value = response.data || [];
+    // Load users
+    const userResponse = await getUsers({ show: 100 });
+    users.value = userResponse.data || [];
     userOptions.value = users.value.map((user) => ({
       value: user.id,
       label:
@@ -372,9 +239,9 @@ async function loadUserOptions() {
       phone_num: user.phone_num,
     }));
   } catch (error) {
-    console.error("Failed to load users", error);
+    console.error("Failed to load data", error);
   }
-}
+});
 
 function validateForm() {
   errors.value = {};
@@ -406,7 +273,7 @@ async function handleSubmit() {
     return;
   }
 
-  submitting.value = true;
+  loading.value = true;
   errors.value = {};
   successMessage.value = null;
   errorMessage.value = null;
@@ -414,8 +281,7 @@ async function handleSubmit() {
   try {
     // Update phone_num from array before submitting
     updatePhoneNumFromArray();
-    const id = Number(route.params.id);
-    await updateCourse(id, {
+    await createCourse({
       type_id: form.value.type_id!,
       user_id: form.value.user_id!,
       phone_num: form.value.phone_num, // Already JSON array string
@@ -424,14 +290,24 @@ async function handleSubmit() {
       date: form.value.date || undefined,
     });
 
-    successMessage.value = "Course updated successfully";
-    await loadCourse(); // Reload to get updated data
+    successMessage.value = "Course created successfully";
 
+    // Reset form
+    form.value = {
+      type_id: null,
+      user_id: null,
+      phone_num: "",
+      address: "",
+      description: "",
+      date: "",
+    };
+
+    // Auto-hide success message after 3 seconds
     setTimeout(() => {
       successMessage.value = null;
     }, 3000);
   } catch (error: any) {
-    console.error("Failed to update course", error);
+    console.error("Failed to create course", error);
 
     if (error?.response?.data?.errors) {
       const backendErrors = error.response.data.errors;
@@ -451,20 +327,14 @@ async function handleSubmit() {
     errorMessage.value =
       error?.response?.data?.message ||
       error?.message ||
-      "Failed to update course. Please try again.";
+      "Failed to create course. Please try again.";
 
+    // Auto-hide error message after 3 seconds
     setTimeout(() => {
       errorMessage.value = null;
     }, 3000);
   } finally {
-    submitting.value = false;
+    loading.value = false;
   }
 }
-
-onMounted(async () => {
-  // Load options first
-  await Promise.all([loadTypeOptions(), loadUserOptions()]);
-  // Then load course data (which will set the form values)
-  await loadCourse();
-});
 </script>

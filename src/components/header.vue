@@ -139,7 +139,7 @@
         <span class="hidden md:inline">{{ themeLabel }}</span>
       </button>
       <RouterLink
-        to="/users/profile"
+        to="/admin/profile"
         class="glass-button bg-amber-500/95 px-3 py-2"
       >
         <Icon icon="heroicons:user-20-solid" class="w-5 h-5" />

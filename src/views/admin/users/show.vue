@@ -1,11 +1,8 @@
 <template>
   <div class="space-y-6">
-    <Heading title="User Overview" link="/users" buttonText="Back" />
+    <Heading title="User Overview" link="/admin/users" buttonText="Back" />
 
-    <div
-      v-if="notFound"
-      class="surface-card p-8 text-center"
-    >
+    <div v-if="notFound" class="surface-card p-8 text-center">
       <div
         class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600"
       >
@@ -17,12 +14,16 @@
         back to the users list and try again.
       </p>
       <RouterLink
-        to="/users"
+        to="/admin/users"
         class="mt-5 inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-105 active:translate-y-px"
       >
         <Icon icon="heroicons:arrow-uturn-left-20-solid" class="h-4 w-4" />
         Back to Users
       </RouterLink>
+    </div>
+
+    <div v-else-if="loading" class="surface-card relative min-h-[400px]">
+      <Loading />
     </div>
 
     <div
@@ -70,7 +71,7 @@
             </div>
 
             <RouterLink
-              :to="`/users/${user.id}/edit`"
+              :to="`/admin/users/${user.id}/edit`"
               class="ml-auto inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100"
             >
               <Icon icon="heroicons:pencil-square-20-solid" class="h-4 w-4" />
@@ -81,11 +82,7 @@
           <p class="mt-4 text-sm text-slate-600">{{ statusDescription }}</p>
 
           <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div
-              v-for="stat in statCards"
-              :key="stat.id"
-              class="surface-panel"
-            >
+            <div v-for="stat in statCards" :key="stat.id" class="surface-panel">
               <div class="flex items-center justify-between">
                 <span
                   class="text-xs font-medium uppercase tracking-wide text-slate-400"
@@ -101,121 +98,24 @@
           </div>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-2">
-          <div
-            class="surface-card"
-          >
-            <h3 class="text-sm font-semibold text-slate-700">Contact</h3>
-            <div class="mt-4 space-y-4">
-              <div
-                v-for="detail in contactDetails"
-                :key="detail.label"
-                class="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm transition dark:border-slate-800/70 dark:bg-slate-900/50"
-              >
-                <div class="flex items-center gap-3 text-slate-500">
-                  <Icon :icon="detail.icon" class="h-5 w-5 text-amber-500" />
-                  <span class="font-medium text-slate-600">{{
-                    detail.label
-                  }}</span>
-                </div>
-                <span class="text-right text-slate-700">
-                  {{ detail.value }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="surface-card"
-          >
-            <h3 class="text-sm font-semibold text-slate-700">Teams & Focus</h3>
-            <div class="mt-3">
-              <p class="text-xs uppercase tracking-wide text-slate-400">
-                Teams
-              </p>
-              <div class="mt-2 flex flex-wrap gap-2">
-                <span
-                  v-for="team in teams"
-                  :key="team"
-                  class="surface-pill"
-                >
-                  <Icon
-                    icon="heroicons:user-group-20-solid"
-                    class="h-4 w-4 text-slate-400"
-                  />
-                  {{ team }}
-                </span>
-                <span v-if="!teams.length" class="text-sm text-slate-500">
-                  No teams assigned.
-                </span>
-              </div>
-            </div>
-            <div class="mt-5">
-              <p class="text-xs uppercase tracking-wide text-slate-400">
-                Focus areas
-              </p>
-              <div class="mt-2 flex flex-wrap gap-2">
-                <span
-                  v-for="area in focusAreas"
-                  :key="area"
-                  class="inline-flex items-center gap-1 rounded-full bg-emerald-100/70 px-3 py-1 text-xs font-medium text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300"
-                >
-                  <Icon
-                    icon="heroicons:sparkles-20-solid"
-                    class="h-4 w-4 text-emerald-500"
-                  />
-                  {{ area }}
-                </span>
-                <span v-if="!focusAreas.length" class="text-sm text-slate-500">
-                  No focus areas recorded.
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="surface-card">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-700">
-              Permissions & Access
-            </h3>
-            <span class="text-xs text-slate-400"
-              >Last updated {{ formattedUpdatedAt }}</span
-            >
-          </div>
-
-          <ul class="mt-4 grid gap-3 sm:grid-cols-2">
-            <li
-              v-for="permission in permissions"
-              :key="permission"
-              class="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm text-slate-600 transition dark:border-slate-800/70 dark:bg-slate-900/50 dark:text-slate-300"
-            >
-              <Icon
-                icon="heroicons:check-circle-20-solid"
-                class="mt-0.5 h-5 w-5 text-emerald-500"
-              />
-              <span>{{ permission }}</span>
-            </li>
-            <li
-              v-if="!permissions.length"
-              class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500"
-            >
-              No permissions configured.
-            </li>
-          </ul>
-
+          <h3 class="text-sm font-semibold text-slate-700">Contact</h3>
+          <div class="mt-4 space-y-4">
             <div
-            v-if="hasNotes"
-            class="mt-5 rounded-xl border border-slate-200/60 bg-white/80 p-4 text-sm text-slate-600 dark:border-slate-800/60 dark:bg-slate-900/50 dark:text-slate-300"
-          >
-            <p
-              class="text-xs font-semibold uppercase tracking-wide text-slate-400"
+              v-for="detail in contactDetails"
+              :key="detail.label"
+              class="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 text-sm transition dark:border-slate-800/70 dark:bg-slate-900/50"
             >
-              Internal notes
-            </p>
-            <p class="mt-2 leading-relaxed">
-              {{ user.notes }}
-            </p>
+              <div class="flex items-center gap-3 text-slate-500">
+                <Icon :icon="detail.icon" class="h-5 w-5 text-amber-500" />
+                <span class="font-medium text-slate-600">{{
+                  detail.label
+                }}</span>
+              </div>
+              <span class="text-right text-slate-700">
+                {{ detail.value }}
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -257,51 +157,38 @@
             >
               <dt class="flex items-center gap-2 text-slate-500">
                 <Icon
-                  icon="heroicons:device-phone-mobile-20-solid"
-                  class="h-5 w-5 text-purple-500"
+                  icon="heroicons:trash-20-solid"
+                  class="h-5 w-5 text-red-500"
                 />
-                Preferred device
+                Deleted
               </dt>
-              <dd class="font-medium text-slate-700">
-                {{ user.preferredDevice || "Unknown" }}
+              <dd
+                class="text-xs font-medium"
+                :class="
+                  isDeleted
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-emerald-600 dark:text-emerald-400'
+                "
+              >
+                {{ isDeleted ? "Soft deleted" : "Active" }}
               </dd>
             </div>
           </dl>
         </div>
 
         <div class="surface-card">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-700">
-              Recent activity
-            </h3>
-            <span class="text-xs text-slate-400"
-              >Last {{ activity.length }} events</span
-            >
+          <h3 class="text-sm font-semibold text-slate-700">Address</h3>
+          <div
+            class="mt-3 flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300"
+          >
+            <Icon
+              icon="heroicons:home-modern-20-solid"
+              class="h-5 w-5 text-amber-500"
+            />
+            <p class="whitespace-pre-line leading-relaxed">
+              {{ user.address || "Not specified" }}
+            </p>
           </div>
-          <ul class="mt-4 space-y-3">
-            <li
-              v-for="item in activity"
-              :key="item.id"
-              class="flex items-start gap-3 rounded-xl border border-slate-200/60 bg-white/70 px-4 py-3 transition dark:border-slate-800/70 dark:bg-slate-900/50"
-            >
-              <span
-                class="mt-1 h-2.5 w-2.5 rounded-full"
-                :class="activityToneClass(item.tone)"
-              ></span>
-              <div>
-                <p class="text-sm font-medium text-slate-700">
-                  {{ item.title }}
-                </p>
-                <p class="text-xs text-slate-500">{{ item.subtitle }}</p>
-              </div>
-            </li>
-            <li
-              v-if="activity.length === 0"
-              class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400"
-            >
-              No recorded activity for this user yet.
-            </li>
-          </ul>
         </div>
 
         <div
@@ -323,7 +210,7 @@
             </div>
           </div>
           <RouterLink
-            :to="`/users/${user.id}/edit`"
+            :to="`/admin/users/${user.id}/edit`"
             class="mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-600 transition hover:bg-amber-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 dark:border-amber-400/50 dark:bg-slate-900/40 dark:text-amber-200 dark:hover:bg-amber-400/10"
           >
             <Icon icon="heroicons:calendar-20-solid" class="h-4 w-4" />
@@ -340,13 +227,8 @@ import { Icon } from "@iconify/vue";
 import { computed, ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import Heading from "../../../components/heading.vue";
-
-interface ActivityItem {
-  id: string;
-  title: string;
-  subtitle: string;
-  tone?: "positive" | "neutral" | "warning";
-}
+import Loading from "../../../components/loading.vue";
+import { getUser, type User } from "../../../api/users";
 
 interface StatCard {
   id: string;
@@ -356,210 +238,44 @@ interface StatCard {
   icon: string;
 }
 
-interface MockUser {
+interface UserOverview {
   id: number;
   name: string;
   email: string;
   role: string;
   phone?: string;
   location?: string;
+  gender?: string;
+  address?: string;
+  dateOfBirth?: string;
+  listeningFrom?: string | null;
+  image?: number | string | null;
+  sittingId?: number | null;
+  deletedAt?: string | null;
   isActive: boolean;
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
   lastLogin?: string;
-  preferredDevice?: string;
-  teams?: string[];
-  focusAreas?: string[];
-  permissions?: string[];
   stats?: StatCard[];
-  activity?: ActivityItem[];
 }
 
-const MOCK_USERS: MockUser[] = [
-  {
-    id: 1,
-    name: "Ali Kareem",
-    email: "ali@example.com",
-    role: "Admin",
-    phone: "+966 500 123 456",
-    location: "Makkah, Saudi Arabia",
-    isActive: true,
-    notes:
-      "Leads the moderation team. Keep him in the weekly analytics reports.",
-    createdAt: "2024-05-20T08:10:00Z",
-    updatedAt: "2025-11-01T10:24:00Z",
-    lastLogin: "2025-11-07T18:32:00Z",
-    preferredDevice: "Desktop · Chrome",
-    teams: ["Content Strategy", "Moderation"],
-    focusAreas: ["Moderation workflow", "Analytics insights", "Team coaching"],
-    permissions: [
-      "Approve new reciters and content submissions",
-      "Manage administrator accounts",
-      "Access advanced analytics dashboards",
-      "Configure platform-wide settings",
-    ],
-    stats: [
-      {
-        id: "approved",
-        label: "Items approved",
-        value: "128",
-        hint: "+12 this month",
-        icon: "heroicons:check-circle-20-solid",
-      },
-      {
-        id: "reviews",
-        label: "Reviews completed",
-        value: "46",
-        hint: "Avg. turnaround 4h",
-        icon: "heroicons:clipboard-document-check-20-solid",
-      },
-      {
-        id: "team",
-        label: "Team members",
-        value: "8",
-        hint: "3 active moderators",
-        icon: "heroicons:user-group-20-solid",
-      },
-    ],
-    activity: [
-      {
-        id: "a1",
-        title: "Approved a new reciter submission",
-        subtitle: "3 days ago · From desktop",
-        tone: "positive",
-      },
-      {
-        id: "a2",
-        title: "Updated translation content",
-        subtitle: "6 days ago · Surah Al-Baqarah",
-        tone: "neutral",
-      },
-      {
-        id: "a3",
-        title: "Reset password for an editor",
-        subtitle: "1 week ago",
-        tone: "warning",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Fatima Zahra",
-    email: "fatima@example.com",
-    role: "Editor",
-    phone: "+971 50 765 4321",
-    location: "Dubai, UAE",
-    isActive: true,
-    notes: "Focuses on audio library quality checks.",
-    createdAt: "2024-02-15T09:00:00Z",
-    updatedAt: "2025-10-21T14:05:00Z",
-    lastLogin: "2025-11-06T09:14:00Z",
-    preferredDevice: "iPad · Safari",
-    teams: ["Audio Quality", "Content Review"],
-    focusAreas: ["Audio verification", "Contributor onboarding"],
-    permissions: [
-      "Edit and publish audio content",
-      "Manage contributor feedback",
-      "Flag content for moderation review",
-    ],
-    stats: [
-      {
-        id: "uploads",
-        label: "Uploads reviewed",
-        value: "312",
-        hint: "Top contributor this month",
-        icon: "heroicons:arrow-up-tray-20-solid",
-      },
-      {
-        id: "issues",
-        label: "Issues flagged",
-        value: "18",
-        hint: "5 awaiting follow-up",
-        icon: "heroicons:flag-20-solid",
-      },
-      {
-        id: "rating",
-        label: "Quality rating",
-        value: "4.8",
-        hint: "Based on team feedback",
-        icon: "heroicons:sparkles-20-solid",
-      },
-    ],
-    activity: [
-      {
-        id: "b1",
-        title: "Flagged audio inconsistencies",
-        subtitle: "Yesterday · Needs follow-up",
-        tone: "warning",
-      },
-      {
-        id: "b2",
-        title: "Uploaded 12 verified recitations",
-        subtitle: "4 days ago",
-        tone: "positive",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Bilal Hassan",
-    email: "bilal@example.com",
-    role: "Moderator",
-    phone: "+60 12 345 6789",
-    location: "Kuala Lumpur, Malaysia",
-    isActive: false,
-    notes:
-      "Currently on extended leave. Reactivate after confirming availability.",
-    createdAt: "2023-11-02T11:40:00Z",
-    updatedAt: "2025-09-18T07:48:00Z",
-    lastLogin: "2025-08-30T15:05:00Z",
-    preferredDevice: "Android · Chrome",
-    teams: ["Community support"],
-    focusAreas: ["User reports", "Compliance"],
-    permissions: [
-      "Moderate community reports",
-      "Suspend user-generated content",
-    ],
-    stats: [
-      {
-        id: "reports",
-        label: "Reports resolved",
-        value: "89",
-        hint: "Paused since Sep",
-        icon: "heroicons:shield-check-20-solid",
-      },
-      {
-        id: "response",
-        label: "Avg. response",
-        value: "2.5h",
-        hint: "When active",
-        icon: "heroicons:bolt-20-solid",
-      },
-      {
-        id: "status",
-        label: "Status",
-        value: "Inactive",
-        hint: "Requires reactivation",
-        icon: "heroicons:pause-circle-20-solid",
-      },
-    ],
-    activity: [
-      {
-        id: "c1",
-        title: "Suspended for inactivity",
-        subtitle: "2 months ago",
-        tone: "neutral",
-      },
-    ],
-  },
-];
+const roleLabelById: Record<string, string> = {
+  "1": "Admin",
+  "2": "Moderator",
+  "3": "User",
+};
+
+const genderLabelById: Record<string, string> = {
+  "1": "Male",
+  "2": "Female",
+};
 
 const route = useRoute();
 
+const loading = ref(true);
 const notFound = ref(false);
-const user = ref<MockUser | null>(null);
-const activity = ref<ActivityItem[]>([]);
+const user = ref<UserOverview | null>(null);
 const stats = ref<StatCard[]>([]);
 
 watch(
@@ -608,14 +324,29 @@ const contactDetails = computed(() => {
       icon: "heroicons:envelope-open-20-solid",
     },
     {
+      label: "Location",
+      value: user.value.location || "Not specified",
+      icon: "heroicons:map-pin-20-solid",
+    },
+    {
       label: "Phone",
       value: user.value.phone || "Not provided",
       icon: "heroicons:phone-20-solid",
     },
     {
-      label: "Location",
-      value: user.value.location || "Not specified",
-      icon: "heroicons:map-pin-20-solid",
+      label: "Gender",
+      value: user.value.gender ?? "Not specified",
+      icon: "heroicons:user-20-solid",
+    },
+    {
+      label: "Date of birth",
+      value: user.value.dateOfBirth || "Not specified",
+      icon: "heroicons:cake-20-solid",
+    },
+    {
+      label: "Listening from",
+      value: user.value.listeningFrom || "Not specified",
+      icon: "heroicons:ear-20-solid",
     },
     {
       label: "Role",
@@ -625,10 +356,7 @@ const contactDetails = computed(() => {
   ];
 });
 
-const teams = computed(() => user.value?.teams ?? []);
-const focusAreas = computed(() => user.value?.focusAreas ?? []);
-const permissions = computed(() => user.value?.permissions ?? []);
-const hasNotes = computed(() => Boolean(user.value?.notes?.trim()));
+const isDeleted = computed(() => Boolean(user.value?.deletedAt));
 
 const formattedLastLogin = computed(() =>
   formatDateFromISO(user.value?.lastLogin)
@@ -640,29 +368,69 @@ const formattedUpdatedAt = computed(() =>
   formatDateFromISO(user.value?.updatedAt)
 );
 
-function loadUser() {
+async function loadUser() {
   const idParam = Number(route.params.id);
   if (Number.isNaN(idParam)) {
     user.value = null;
     stats.value = [];
-    activity.value = [];
     notFound.value = true;
+    loading.value = false;
     return;
   }
 
-  const found = MOCK_USERS.find((item) => item.id === idParam);
-  if (!found) {
+  try {
+    loading.value = true;
+    const backendUser: User = await getUser(idParam);
+
+    const name =
+      [backendUser.first_name, backendUser.last_name]
+        .filter(Boolean)
+        .join(" ") || backendUser.email;
+
+    const rawRole: string | number | undefined =
+      (backendUser as any).role_id ?? backendUser.role;
+    const roleId = rawRole != null ? String(rawRole) : "3";
+    const role = roleLabelById[roleId] ?? "User";
+
+    const genderCode = backendUser.gender ?? undefined;
+    const genderLabel =
+      genderCode != null && genderLabelById[String(genderCode)]
+        ? genderLabelById[String(genderCode)]
+        : genderCode ?? undefined;
+
+    const overview: UserOverview = {
+      id: backendUser.id,
+      name,
+      email: backendUser.email,
+      role,
+      phone: backendUser.phone_num ?? "",
+      location: backendUser.city ?? "",
+      gender: genderLabel,
+      address: backendUser.address,
+      dateOfBirth: backendUser.date_of_birth ?? undefined,
+      listeningFrom: backendUser.listening_from ?? null,
+      image: backendUser.image ?? null,
+      sittingId: backendUser.sitting_id ?? null,
+      deletedAt: backendUser.softDelete ?? null,
+      isActive: !backendUser.softDelete,
+      notes: (backendUser as any).notes ?? "",
+      createdAt: backendUser.created_at ?? undefined,
+      updatedAt: backendUser.updated_at ?? undefined,
+      lastLogin: (backendUser as any).last_login,
+      stats: [],
+    };
+
+    notFound.value = false;
+    user.value = overview;
+    stats.value = overview.stats ?? [];
+  } catch (error) {
+    console.error("Failed to load user", error);
     user.value = null;
     stats.value = [];
-    activity.value = [];
     notFound.value = true;
-    return;
+  } finally {
+    loading.value = false;
   }
-
-  notFound.value = false;
-  user.value = { ...found };
-  stats.value = found.stats ? [...found.stats] : [];
-  activity.value = found.activity ? [...found.activity] : [];
 }
 
 function formatDateFromISO(iso?: string) {
@@ -675,16 +443,7 @@ function formatDateFromISO(iso?: string) {
   }).format(date);
 }
 
-function activityToneClass(tone?: ActivityItem["tone"]) {
-  switch (tone) {
-    case "positive":
-      return "bg-emerald-400";
-    case "warning":
-      return "bg-amber-400";
-    default:
-      return "bg-slate-300";
-  }
-}
+// no-op
 </script>
 
 <style scoped></style>

@@ -61,10 +61,23 @@ export async function logout(): Promise<void> {
  * Get current authenticated user
  */
 export async function getCurrentUser(): Promise<LoginResponse["user"]> {
-  const response = await apiClient.get<{ data: LoginResponse["user"] }>(
-    "/user"
-  );
-  return response.data.data;
+  // Most Laravel APIs expose the currently authenticated user at GET /user
+  // We handle multiple common response shapes:
+  // - { data: { ...user } }
+  // - { user: { ...user } }
+  // - { ...user }
+  const response = await apiClient.get<any>("/user");
+  const data = response.data;
+
+  if (data?.data) {
+    return data.data;
+  }
+
+  if (data?.user) {
+    return data.user;
+  }
+
+  return data as LoginResponse["user"];
 }
 
 /**

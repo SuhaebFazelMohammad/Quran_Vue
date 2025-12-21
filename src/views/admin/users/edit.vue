@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <Heading title="Edit User" link="/users" buttonText="Back" />
+    <Heading title="Edit User" link="/admin/users" buttonText="Back" />
 
     <div v-if="notFound" class="surface-card p-8 text-center">
       <div
@@ -14,7 +14,7 @@
         back to the users list and try again.
       </p>
       <RouterLink
-        to="/users"
+        to="/admin/users"
         class="mt-5 inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-105 active:translate-y-px"
       >
         <Icon icon="heroicons:arrow-uturn-left-20-solid" class="h-4 w-4" />
@@ -22,12 +22,17 @@
       </RouterLink>
     </div>
 
+    <div v-else-if="loading" class="surface-card relative min-h-[400px]">
+      <Loading />
+    </div>
+
     <div v-else class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <form
         @submit.prevent="handleSubmit"
-        class="surface-card space-y-6"
+        class="surface-card space-y-6 relative"
         novalidate
       >
+        <Loading v-if="loading" />
         <div class="flex flex-wrap items-center gap-3">
           <div>
             <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -43,9 +48,13 @@
           >
             <span
               class="h-2 w-2 rounded-full"
-              :class="form.isActive ? 'bg-emerald-500 dark:bg-emerald-300' : 'bg-slate-400 dark:bg-slate-500'"
+              :class="
+                isActive
+                  ? 'bg-emerald-500 dark:bg-emerald-300'
+                  : 'bg-slate-400 dark:bg-slate-500'
+              "
             ></span>
-            {{ form.isActive ? "Active" : "Inactive" }}
+            {{ isActive ? "Active" : "Inactive" }}
           </span>
           <span class="ml-auto text-xs text-slate-500 dark:text-slate-400">
             Created {{ formattedCreatedAt }}
@@ -54,12 +63,23 @@
 
         <div class="grid gap-5 sm:grid-cols-2">
           <Text
-            id="name"
-            v-model="form.name"
-            label="Full name"
-            placeholder="Enter full name"
+            id="first_name"
+            v-model="form.first_name"
+            label="First name"
+            placeholder="Enter first name"
             icon-left="heroicons:user-circle-20-solid"
-            :error="errors.name"
+            :error="errors.first_name"
+            clearable
+            required
+          />
+
+          <Text
+            id="last_name"
+            v-model="form.last_name"
+            label="Last name"
+            placeholder="Enter last name"
+            icon-left="heroicons:user-circle-20-solid"
+            :error="errors.last_name"
             clearable
             required
           />
@@ -91,103 +111,137 @@
             hint="Choose the appropriate permission level"
           />
 
-          <Text
-            id="phone"
-            v-model="form.phone"
-            type="tel"
-            label="Phone number"
-            placeholder="+966 500 000 000"
-            icon-left="heroicons:phone-20-solid"
-            :error="errors.phone"
-            hint="Optional — include country code"
-            clearable
-            autocomplete="tel"
+          <Select
+            id="gender"
+            v-model="form.gender"
+            label="Gender"
+            :options="genderOptions"
+            placeholder="Select gender"
+            :clearable="true"
+            :searchable="false"
+            :error="errors.gender"
           />
         </div>
 
         <div class="grid gap-5 sm:grid-cols-2">
           <Text
-            id="location"
-            v-model="form.location"
-            label="Location"
-            placeholder="City, Country"
+            id="phone_num"
+            v-model="form.phone_num"
+            type="tel"
+            label="Phone number"
+            placeholder="+966 500 000 000"
+            icon-left="heroicons:phone-20-solid"
+            :error="errors.phone_num"
+            hint="Optional — include country code"
+            clearable
+            autocomplete="tel"
+          />
+
+          <DateInput
+            id="date_of_birth"
+            v-model="form.date_of_birth"
+            label="Date of birth"
+            :error="errors.date_of_birth"
+            clearable
+          />
+        </div>
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <Text
+            id="city"
+            v-model="form.city"
+            label="City"
+            placeholder="Enter city"
             icon-left="heroicons:map-pin-20-solid"
-            :error="errors.location"
+            :error="errors.city"
             clearable
           />
 
-          <div class="flex flex-col gap-1.5">
-            <label for="notes" class="text-sm font-medium text-slate-700"
-              >Notes</label
-            >
-            <textarea
-              id="notes"
-              v-model="form.notes"
-              rows="4"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-amber-400"
-              placeholder="Add a short internal note about this user..."
-              maxlength="280"
-            ></textarea>
-            <div class="text-xs">
-              <p v-if="errors.notes" class="text-red-600 dark:text-red-400">
-                {{ errors.notes }}
+          <Text
+            id="listening_from"
+            v-model="form.listening_from"
+            label="Listening from"
+            placeholder="Enter listening source"
+            icon-left="heroicons:ear-20-solid"
+            :error="errors.listening_from"
+            clearable
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="address" class="text-sm font-medium text-slate-700"
+            >Address</label
+          >
+          <textarea
+            id="address"
+            v-model="form.address"
+            rows="4"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-amber-400"
+            placeholder="Enter full address..."
+          ></textarea>
+          <div class="text-xs">
+            <p v-if="errors.address" class="text-red-600 dark:text-red-400">
+              {{ errors.address }}
+            </p>
+          </div>
+        </div>
+
+        <div class="surface-panel space-y-4 px-4 py-4">
+          <div class="flex flex-wrap items-center gap-4">
+            <div>
+              <p
+                class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+              >
+                Account status
               </p>
-              <p v-else class="text-slate-500 dark:text-slate-400">
-                {{ form.notes.length }}/280 characters
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                {{ statusDescription }}
               </p>
             </div>
-          </div>
-        </div>
-
-        <div
-          class="surface-panel flex flex-wrap items-center gap-4 px-4 py-4"
-        >
-          <div>
-            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
-              Account status
-            </p>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              {{ statusDescription }}
-            </p>
-          </div>
-          <button
-            type="button"
-            class="relative inline-flex h-7 w-14 items-center rounded-full transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 dark:focus-visible:ring-amber-400/20"
-            :class="form.isActive ? 'bg-emerald-500/80 dark:bg-emerald-400/60' : 'bg-slate-300 dark:bg-slate-700'"
-            :aria-pressed="form.isActive"
-            @click="toggleStatus"
-          >
-            <span
-              class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
-              :class="form.isActive ? 'translate-x-7' : 'translate-x-2'"
-            ></span>
-          </button>
-          <span
-            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition"
-            :class="statusBadgeClass"
-          >
-            <Icon
-              :icon="
-                form.isActive
-                  ? 'heroicons:check-badge-20-solid'
-                  : 'heroicons:clock-20-solid'
+            <button
+              type="button"
+              class="relative inline-flex h-7 w-14 items-center rounded-full transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-100 dark:focus-visible:ring-amber-400/20"
+              :class="
+                isActive
+                  ? 'bg-emerald-500/80 dark:bg-emerald-400/60'
+                  : 'bg-slate-300 dark:bg-slate-700'
               "
-              class="h-4 w-4"
-            />
-            {{ form.isActive ? "Active" : "Temporarily paused" }}
-          </span>
-        </div>
-
-        <div
-          v-if="successMessage"
-          class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-200"
-        >
-          <Icon icon="heroicons:check-circle-20-solid" class="mt-0.5 h-5 w-5" />
-          <div>
-            <p class="font-medium">Changes saved</p>
-            <p class="text-xs text-emerald-600/80">{{ successMessage }}</p>
+              :aria-pressed="isActive"
+              @click="toggleStatus"
+            >
+              <span
+                class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition"
+                :class="isActive ? 'translate-x-7' : 'translate-x-2'"
+              ></span>
+            </button>
+            <span
+              class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition"
+              :class="statusBadgeClass"
+            >
+              <Icon
+                :icon="
+                  isActive
+                    ? 'heroicons:check-badge-20-solid'
+                    : 'heroicons:clock-20-solid'
+                "
+                class="h-4 w-4"
+              />
+              {{ isActive ? "Active" : "Temporarily paused" }}
+            </span>
           </div>
         </div>
+
+        <SuccessMessage
+          v-if="successMessage"
+          :title="successMessage"
+          message="The user information has been updated successfully."
+        />
+
+        <ErrorMessage
+          v-if="errorMessage"
+          :title="errorMessage"
+          message="Please check the form and try again."
+        />
 
         <div class="flex flex-wrap items-center gap-3 pt-1">
           <button
@@ -213,7 +267,7 @@
           </button>
 
           <RouterLink
-            to="/users"
+            to="/admin/users"
             class="inline-flex items-center gap-2 rounded-lg border border-transparent px-4 py-2.5 text-sm font-medium text-slate-500 transition hover:text-slate-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-100 dark:text-slate-300 dark:hover:text-amber-200"
           >
             Cancel
@@ -234,8 +288,13 @@
               {{ initials }}
             </div>
             <div>
-              <p class="text-sm font-semibold text-slate-700 dark:text-slate-100">
-                {{ form.name || "Unnamed user" }}
+              <p
+                class="text-sm font-semibold text-slate-700 dark:text-slate-100"
+              >
+                {{
+                  [form.first_name, form.last_name].filter(Boolean).join(" ") ||
+                  "Unnamed user"
+                }}
               </p>
               <p class="text-xs text-slate-500 dark:text-slate-400">
                 {{ form.email || "No email set" }}
@@ -243,8 +302,12 @@
             </div>
           </div>
 
-          <div class="mt-5 space-y-3 text-sm text-slate-600 dark:text-slate-300">
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+          <div
+            class="mt-5 space-y-3 text-sm text-slate-600 dark:text-slate-300"
+          >
+            <div
+              class="flex items-center justify-between text-slate-500 dark:text-slate-400"
+            >
               <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:shield-check-20-solid"
@@ -253,10 +316,16 @@
                 Role
               </span>
               <span class="font-medium text-slate-700 dark:text-slate-100">
-                {{ form.role || "Not assigned" }}
+                {{
+                  form.role
+                    ? roleLabelById[form.role] || form.role
+                    : "Not assigned"
+                }}
               </span>
             </div>
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <div
+              class="flex items-center justify-between text-slate-500 dark:text-slate-400"
+            >
               <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:map-pin-20-solid"
@@ -265,10 +334,12 @@
                 Location
               </span>
               <span class="font-medium text-slate-700 dark:text-slate-100">
-                {{ form.location || "Not specified" }}
+                {{ form.city || "Not specified" }}
               </span>
             </div>
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <div
+              class="flex items-center justify-between text-slate-500 dark:text-slate-400"
+            >
               <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:device-phone-mobile-20-solid"
@@ -277,10 +348,12 @@
                 Phone
               </span>
               <span class="font-medium text-slate-700 dark:text-slate-100">
-                {{ form.phone || "Not provided" }}
+                {{ form.phone_num || "Not provided" }}
               </span>
             </div>
-            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <div
+              class="flex items-center justify-between text-slate-500 dark:text-slate-400"
+            >
               <span class="flex items-center gap-2">
                 <Icon
                   icon="heroicons:clock-20-solid"
@@ -295,23 +368,25 @@
           </div>
 
           <div
-            v-if="form.notes"
+            v-if="form.address"
             class="mt-5 rounded-xl border border-slate-200/60 bg-white/70 p-4 text-sm text-slate-600 dark:border-slate-800/70 dark:bg-slate-900/50 dark:text-slate-300"
           >
             <p
               class="text-xs font-semibold uppercase tracking-wide text-slate-400"
             >
-              Internal notes
+              Address
             </p>
-            <p class="mt-2 leading-relaxed">
-              {{ form.notes }}
+            <p class="mt-2 leading-relaxed whitespace-pre-line">
+              {{ form.address }}
             </p>
           </div>
         </div>
 
         <div class="surface-card">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-100">
+            <h3
+              class="text-sm font-semibold text-slate-700 dark:text-slate-100"
+            >
               Recent activity
             </h3>
             <span class="text-xs text-slate-400 dark:text-slate-500"
@@ -329,7 +404,9 @@
                 :class="activityToneClass(item.tone)"
               ></span>
               <div>
-                <p class="text-sm font-medium text-slate-700 dark:text-slate-100">
+                <p
+                  class="text-sm font-medium text-slate-700 dark:text-slate-100"
+                >
                   {{ item.title }}
                 </p>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
@@ -355,10 +432,15 @@ import { Icon } from "@iconify/vue";
 import { computed, ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import Heading from "../../../components/heading.vue";
+import Loading from "../../../components/loading.vue";
 import Select, {
   type SelectOption,
 } from "../../../components/input/select.vue";
 import Text from "../../../components/input/text.vue";
+import DateInput from "../../../components/input/date.vue";
+import SuccessMessage from "../../../components/message/success.vue";
+import ErrorMessage from "../../../components/message/error.vue";
+import { getUser, updateUser, type User } from "../../../api/users";
 
 interface ActivityItem {
   id: string;
@@ -367,146 +449,74 @@ interface ActivityItem {
   tone?: "positive" | "neutral" | "warning";
 }
 
-interface MockUser {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  phone?: string;
-  location?: string;
-  notes?: string;
-  isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  lastLogin?: string;
-  activity?: ActivityItem[];
-}
-
 interface UserForm {
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   role: string | undefined;
-  phone: string;
-  location: string;
-  notes: string;
-  isActive: boolean;
+  phone_num: string;
+  city: string;
+  gender: string | undefined;
+  address: string;
+  date_of_birth: string;
+  listening_from: string;
+  deleted_at: string | null;
 }
 
 type FormErrors = Partial<
-  Record<"name" | "email" | "role" | "phone" | "location" | "notes", string>
+  Record<
+    | "first_name"
+    | "last_name"
+    | "email"
+    | "role"
+    | "phone_num"
+    | "city"
+    | "gender"
+    | "address"
+    | "date_of_birth"
+    | "listening_from"
+    | "deleted_at",
+    string
+  >
 >;
 
 const roleOptions: SelectOption<string>[] = [
-  { value: "Admin", label: "Admin" },
-  { value: "User", label: "User" },
-  { value: "Super Admin", label: "Super Admin" },
-  { value: "Moderator", label: "Moderator" },
-  { value: "Editor", label: "Editor" },
-  { value: "Viewer", label: "Viewer" },
-  { value: "Guest", label: "Guest" },
-  { value: "Member", label: "Member" },
+  { value: "1", label: "Admin" },
+  { value: "2", label: "Moderator" },
+  { value: "3", label: "User" },
 ];
 
-const MOCK_USERS: MockUser[] = [
-  {
-    id: 1,
-    name: "Ali Kareem",
-    email: "ali@example.com",
-    role: "Admin",
-    phone: "+966 500 123 456",
-    location: "Makkah, Saudi Arabia",
-    notes:
-      "Leads the moderation team. Keep him in the weekly analytics reports.",
-    isActive: true,
-    createdAt: "2024-05-20T08:10:00Z",
-    updatedAt: "2025-11-01T10:24:00Z",
-    lastLogin: "2025-11-07T18:32:00Z",
-    activity: [
-      {
-        id: "a1",
-        title: "Approved a new reciter submission",
-        subtitle: "3 days ago · From desktop",
-        tone: "positive",
-      },
-      {
-        id: "a2",
-        title: "Updated translation content",
-        subtitle: "6 days ago · Surah Al-Baqarah",
-        tone: "neutral",
-      },
-      {
-        id: "a3",
-        title: "Reset password for an editor",
-        subtitle: "1 week ago",
-        tone: "warning",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Fatima Zahra",
-    email: "fatima@example.com",
-    role: "Editor",
-    phone: "+971 50 765 4321",
-    location: "Dubai, UAE",
-    notes: "Focuses on audio library quality checks.",
-    isActive: true,
-    createdAt: "2024-02-15T09:00:00Z",
-    updatedAt: "2025-10-21T14:05:00Z",
-    lastLogin: "2025-11-06T09:14:00Z",
-    activity: [
-      {
-        id: "b1",
-        title: "Flagged audio inconsistencies",
-        subtitle: "Yesterday · Needs follow-up",
-        tone: "warning",
-      },
-      {
-        id: "b2",
-        title: "Uploaded 12 verified recitations",
-        subtitle: "4 days ago",
-        tone: "positive",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Bilal Hassan",
-    email: "bilal@example.com",
-    role: "Moderator",
-    phone: "+60 12 345 6789",
-    location: "Kuala Lumpur, Malaysia",
-    notes: "",
-    isActive: false,
-    createdAt: "2023-11-02T11:40:00Z",
-    updatedAt: "2025-09-18T07:48:00Z",
-    lastLogin: "2025-08-30T15:05:00Z",
-    activity: [
-      {
-        id: "c1",
-        title: "Suspended for inactivity",
-        subtitle: "2 months ago",
-        tone: "neutral",
-      },
-    ],
-  },
+const genderOptions: SelectOption<string>[] = [
+  { value: "1", label: "Male" },
+  { value: "2", label: "Female" },
 ];
+
+const roleLabelById: Record<string, string> = {
+  "1": "Admin",
+  "2": "Moderator",
+  "3": "User",
+};
 
 const route = useRoute();
 
 const loading = ref(false);
 const notFound = ref(false);
 const successMessage = ref("");
+const errorMessage = ref<string | null>(null);
 const errors = ref<FormErrors>({});
 
 const form = ref<UserForm>({
-  name: "",
+  first_name: "",
+  last_name: "",
   email: "",
   role: undefined,
-  phone: "",
-  location: "",
-  notes: "",
-  isActive: true,
+  phone_num: "",
+  city: "",
+  gender: undefined,
+  address: "",
+  date_of_birth: "",
+  listening_from: "",
+  deleted_at: null,
 });
 
 const originalForm = ref<UserForm | null>(null);
@@ -514,24 +524,30 @@ const activity = ref<ActivityItem[]>([]);
 const lastSavedAt = ref<Date | null>(null);
 const lastLogin = ref<Date | null>(null);
 const createdAt = ref<Date | null>(null);
+const userId = ref<number | null>(null);
 
 const initials = computed(() => {
-  if (!form.value.name) return "U";
-  return form.value.name
+  const name = [form.value.first_name, form.value.last_name]
+    .filter(Boolean)
+    .join(" ");
+  if (!name) return "U";
+  return name
     .split(" ")
     .map((part) => part.charAt(0).toUpperCase())
     .slice(0, 2)
     .join("");
 });
 
+const isActive = computed(() => form.value.deleted_at === null);
+
 const statusDescription = computed(() =>
-  form.value.isActive
+  isActive.value
     ? "Active users can log in and manage their assigned responsibilities."
     : "Inactive users cannot access the dashboard until reactivated."
 );
 
 const statusBadgeClass = computed(() =>
-  form.value.isActive
+  isActive.value
     ? "border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-200"
     : "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300"
 );
@@ -563,45 +579,82 @@ watch(
   { deep: true }
 );
 
-function loadUser() {
+async function loadUser() {
   const idParam = Number(route.params.id);
   if (Number.isNaN(idParam)) {
     notFound.value = true;
+    loading.value = false;
     return;
   }
 
-  const user = MOCK_USERS.find((item) => item.id === idParam);
-  if (!user) {
+  userId.value = idParam;
+
+  try {
+    loading.value = true;
+    notFound.value = false;
+    const backendUser: User = await getUser(idParam);
+
+    const [first_name = "", last_name = ""] = (
+      [backendUser.first_name, backendUser.last_name]
+        .filter(Boolean)
+        .join(" ") || backendUser.email
+    ).split(" ", 2);
+
+    const rawRole: string | number | undefined =
+      (backendUser as any).role_id ?? backendUser.role;
+    const roleId = rawRole != null ? String(rawRole) : "3";
+
+    const rawGender: string | number | undefined = backendUser.gender;
+    const genderId = rawGender != null ? String(rawGender) : undefined;
+
+    const userForm: UserForm = {
+      first_name: backendUser.first_name ?? first_name,
+      last_name: backendUser.last_name ?? last_name,
+      email: backendUser.email,
+      role: roleId,
+      phone_num: backendUser.phone_num ?? "",
+      city: backendUser.city ?? "",
+      gender: genderId,
+      address: backendUser.address ?? "",
+      date_of_birth: backendUser.date_of_birth ?? "",
+      listening_from: backendUser.listening_from ?? "",
+      deleted_at: backendUser.softDelete ?? null,
+    };
+
+    form.value = { ...userForm };
+    originalForm.value = { ...userForm };
+    activity.value = [];
+    lastSavedAt.value = backendUser.updated_at
+      ? new Date(backendUser.updated_at)
+      : null;
+    lastLogin.value = (backendUser as any).last_login
+      ? new Date((backendUser as any).last_login)
+      : null;
+    createdAt.value = backendUser.created_at
+      ? new Date(backendUser.created_at)
+      : null;
+    successMessage.value = "";
+    errorMessage.value = null;
+    errors.value = {};
+    notFound.value = false;
+  } catch (error) {
+    console.error("Failed to load user", error);
     notFound.value = true;
-    return;
+    errorMessage.value = "Failed to load user data";
+  } finally {
+    loading.value = false;
   }
-
-  notFound.value = false;
-  const userForm: UserForm = {
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    phone: user.phone ?? "",
-    location: user.location ?? "",
-    notes: user.notes ?? "",
-    isActive: user.isActive,
-  };
-
-  form.value = { ...userForm };
-  originalForm.value = { ...userForm };
-  activity.value = user.activity ?? [];
-  lastSavedAt.value = user.updatedAt ? new Date(user.updatedAt) : null;
-  lastLogin.value = user.lastLogin ? new Date(user.lastLogin) : null;
-  createdAt.value = user.createdAt ? new Date(user.createdAt) : null;
-  successMessage.value = "";
-  errors.value = {};
 }
 
 function validateForm(): boolean {
   const nextErrors: FormErrors = {};
 
-  if (!form.value.name.trim()) {
-    nextErrors.name = "Name is required.";
+  if (!form.value.first_name.trim()) {
+    nextErrors.first_name = "First name is required.";
+  }
+
+  if (!form.value.last_name.trim()) {
+    nextErrors.last_name = "Last name is required.";
   }
 
   if (!form.value.email.trim()) {
@@ -614,37 +667,107 @@ function validateForm(): boolean {
     nextErrors.role = "Select a role for this user.";
   }
 
-  if (form.value.phone.trim()) {
-    const phone = form.value.phone.trim();
-    if (!/^\+?[\d\s-]{7,20}$/.test(phone)) {
-      nextErrors.phone = "Please enter a valid phone number.";
+  if (form.value.phone_num.trim()) {
+    // Remove all non-digit characters for validation
+    const phoneDigits = form.value.phone_num.replace(/\D/g, "");
+    if (phoneDigits.length !== 11) {
+      nextErrors.phone_num = "Phone number must be exactly 11 digits.";
     }
-  }
-
-  if (form.value.notes && form.value.notes.length > 280) {
-    nextErrors.notes = "Notes should be under 280 characters.";
   }
 
   errors.value = nextErrors;
   return Object.keys(nextErrors).length === 0;
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!validateForm()) {
+    return;
+  }
+
+  if (!userId.value) {
+    errorMessage.value = "User ID is missing";
     return;
   }
 
   loading.value = true;
   successMessage.value = "";
+  errorMessage.value = null;
+  errors.value = {};
 
-  setTimeout(() => {
-    loading.value = false;
+  try {
+    // Clean phone number: remove all non-digit characters before sending
+    const cleanPhoneNum = form.value.phone_num
+      ? form.value.phone_num.replace(/\D/g, "")
+      : undefined;
+
+    const updateData: any = {
+      first_name: form.value.first_name,
+      last_name: form.value.last_name,
+      email: form.value.email,
+      role: form.value.role,
+      phone_num: cleanPhoneNum || undefined,
+      city: form.value.city || undefined,
+      gender: form.value.gender || undefined,
+      address: form.value.address || undefined,
+      date_of_birth: form.value.date_of_birth || undefined,
+      listening_from: form.value.listening_from || undefined,
+    };
+
+    // Handle soft delete status change
+    const originalDeletedAt = originalForm.value?.deleted_at ?? null;
+    const currentDeletedAt = form.value.deleted_at;
+
+    // If deleted_at changed, we need to handle it
+    // If current is null and original was not null, restore user
+    // If current is not null and original was null, soft delete user
+    if (currentDeletedAt !== originalDeletedAt) {
+      if (currentDeletedAt === null) {
+        // Restore user - set deleted_at to null
+        updateData.deleted_at = null;
+      } else {
+        // Soft delete user - set deleted_at to current timestamp
+        updateData.deleted_at = currentDeletedAt || new Date().toISOString();
+      }
+    }
+
+    await updateUser(userId.value, updateData);
+
     lastSavedAt.value = new Date();
     successMessage.value = "User details have been updated successfully.";
     if (originalForm.value) {
       originalForm.value = { ...form.value };
     }
-  }, 900);
+
+    // Reload user data to get updated timestamps
+    await loadUser();
+  } catch (error: any) {
+    console.error("Failed to update user", error);
+
+    // Handle validation errors from backend
+    if (error?.response?.data?.errors) {
+      const backendErrors = error.response.data.errors;
+      const mappedErrors: FormErrors = {};
+
+      Object.keys(backendErrors).forEach((key) => {
+        if (key in form.value) {
+          mappedErrors[key as keyof FormErrors] = Array.isArray(
+            backendErrors[key]
+          )
+            ? backendErrors[key][0]
+            : backendErrors[key];
+        }
+      });
+
+      errors.value = mappedErrors;
+    }
+
+    errorMessage.value =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to update user. Please try again.";
+  } finally {
+    loading.value = false;
+  }
 }
 
 function resetForm() {
@@ -654,7 +777,17 @@ function resetForm() {
 }
 
 function toggleStatus() {
-  form.value.isActive = !form.value.isActive;
+  // If deleted_at is null (active), set it to current date (inactive)
+  // If deleted_at is not null (inactive), set it to null (active/restore)
+  if (form.value.deleted_at === null) {
+    // When turning off, automatically set to today's date
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    form.value.deleted_at = today.toISOString();
+  } else {
+    // When turning on, restore user
+    form.value.deleted_at = null;
+  }
 }
 
 function formatDate(date: Date | null): string {

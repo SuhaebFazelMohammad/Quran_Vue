@@ -3,7 +3,7 @@
     <div class="space-y-5">
       <Heading
         title="Course Types"
-        link="/course-type/create"
+        link="/admin/course-type/create"
         buttonText="Add Course Type"
       />
       <div
@@ -22,15 +22,18 @@
           />
           <span>rows</span>
         </div>
-        <SelectFilter
-          :options="levelFilterOptions"
-          v-model="selectedLevel"
-          :clearable="true"
-          :searchable="false"
-          placeholder="Filter by level"
-          icon="heroicons:adjustments-horizontal-20-solid"
-        />
       </div>
+    </div>
+
+    <div v-if="successMessage" class="animate-fade-in">
+      <SuccessMessage
+        :title="successMessage"
+        message="The operation completed successfully."
+      />
+    </div>
+
+    <div v-if="errorMessage" class="animate-fade-in">
+      <ErrorMessage :title="errorMessage" message="Please try again." />
     </div>
 
     <Table
@@ -38,26 +41,14 @@
       :rows="filteredRows"
       :loading="loading"
       :pageSize="pageSizeNumber"
+      :total="totalTypeCourses"
       :empty-text="emptyStateMessage"
       v-model:modelValuePage="page"
       @sort-change="onSortChange"
     >
-      <template #cell-level="{ row }">
-        <span class="inline-flex items-center gap-2">
-          <span
-            class="h-2 w-2 rounded-full"
-            :class="
-              row.level === 'Advanced' ? 'bg-emerald-500' : 'bg-amber-400'
-            "
-          ></span>
-          {{ row.level }}
-        </span>
-      </template>
-
       <template #cell-actions="{ row }">
         <div class="flex items-center gap-2">
-          <ShowButton :to="`/course-type/${row.id}`" />
-          <EditButton :to="`/course-type/${row.id}/edit`" />
+          <EditButton :to="`/admin/course-type/${row.id}/edit`" />
           <DeleteButton
             class="text-xs"
             :confirm-message="`Are you sure you want to delete ${row.name}?`"
@@ -74,12 +65,17 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import Table, { type TableColumn } from "../../../components/table.vue";
 import Select from "../../../components/input/select.vue";
-import SelectFilter from "../../../components/input/selectFilter.vue";
 import DeleteButton from "../../../components/buttons/delete.vue";
 import EditButton from "../../../components/buttons/edit.vue";
-import ShowButton from "../../../components/buttons/show.vue";
 import { useSearchStore } from "../../../stores/search";
 import Heading from "../../../components/heading.vue";
+import SuccessMessage from "../../../components/message/success.vue";
+import ErrorMessage from "../../../components/message/error.vue";
+import {
+  getTypeCourses,
+  deleteTypeCourse,
+  type TypeCourse,
+} from "../../../api/type-courses";
 
 const loading = ref(false);
 const page = ref(1);
@@ -95,66 +91,32 @@ const pageSizeOptions = [
   { value: 50, label: "50" },
 ];
 
-const levelFilterOptions = [
-  { value: "Beginner", label: "Beginner" },
-  { value: "Intermediate", label: "Intermediate" },
-  { value: "Advanced", label: "Advanced" },
-];
-
-const selectedLevel = ref<string | null>(null);
-
 const columns: TableColumn[] = [
   { key: "name", label: "Name", sortable: true },
-  { key: "description", label: "Description", sortable: false },
-  { key: "level", label: "Level", sortable: true },
   { key: "actions", label: "Actions" },
 ];
 
-const allRows = ref([
-  {
-    id: 1,
-    name: "Foundations",
-    description: "Introductory topics covering basics of recitation.",
-    level: "Beginner",
-  },
-  {
-    id: 2,
-    name: "Hifz Support",
-    description: "Structured revision plans for memorisation.",
-    level: "Intermediate",
-  },
-  {
-    id: 3,
-    name: "Advanced Tajweed",
-    description: "In-depth rules with practical application.",
-    level: "Advanced",
-  },
-  {
-    id: 4,
-    name: "Arabic Language Skills",
-    description: "Language tools that support Quranic understanding.",
-    level: "Intermediate",
-  },
-]);
+const allRows = ref<TypeCourse[]>([]);
+const totalTypeCourses = ref(0);
+const successMessage = ref<string | null>(null);
+const errorMessage = ref<string | null>(null);
+const messageTimeoutId = ref<number | null>(null);
 
 const filteredRows = computed(() => {
   const searchValue = query.value.trim().toLowerCase();
-  const levelValue = selectedLevel.value?.toLowerCase() ?? "";
 
-  return allRows.value.filter((row) => {
-    const matchesSearch = searchValue
-      ? [row.name, row.description, row.level]
-          .join(" ")
-          .toLowerCase()
-          .includes(searchValue)
-      : true;
+  return allRows.value
+    .map((typeCourse) => ({
+      id: typeCourse.id,
+      name: typeCourse.name,
+    }))
+    .filter((row) => {
+      const matchesSearch = searchValue
+        ? row.name.toLowerCase().includes(searchValue)
+        : true;
 
-    const matchesLevel = levelValue
-      ? row.level.toLowerCase() === levelValue
-      : true;
-
-    return matchesSearch && matchesLevel;
-  });
+      return matchesSearch;
+    });
 });
 
 const pageSizeNumber = computed(() => Number(pageSize.value ?? 10));
@@ -168,39 +130,105 @@ const emptyStateMessage = computed(() => {
   return "No data available";
 });
 
+const searchDebounceId = ref<number | null>(null);
+
+async function loadTypeCourses() {
+  try {
+    loading.value = true;
+    const response = await getTypeCourses({
+      page: page.value,
+      show: pageSize.value ?? undefined,
+      search: query.value || undefined,
+    });
+
+    allRows.value = response.data;
+    totalTypeCourses.value = response.total;
+  } catch (error) {
+    console.error("Failed to load type courses", error);
+    allRows.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
 watch(query, () => {
   page.value = 1;
-});
 
-watch(selectedLevel, () => {
-  page.value = 1;
-});
-
-watch([filteredRows, pageSizeNumber], ([rows, size]) => {
-  const totalPages = Math.max(1, Math.ceil(rows.length / Math.max(size, 1)));
-  if (page.value > totalPages) {
-    page.value = totalPages;
+  if (searchDebounceId.value !== null) {
+    clearTimeout(searchDebounceId.value);
   }
+  searchDebounceId.value = window.setTimeout(() => {
+    loadTypeCourses();
+  }, 300);
 });
+
+watch(pageSize, () => {
+  page.value = 1;
+  loadTypeCourses();
+});
+
+watch(page, () => {
+  loadTypeCourses();
+});
+
+function clearMessages() {
+  successMessage.value = null;
+  errorMessage.value = null;
+  if (messageTimeoutId.value !== null) {
+    clearTimeout(messageTimeoutId.value);
+    messageTimeoutId.value = null;
+  }
+}
+
+function showSuccessMessage(message: string) {
+  clearMessages();
+  successMessage.value = message;
+  messageTimeoutId.value = window.setTimeout(() => {
+    successMessage.value = null;
+    messageTimeoutId.value = null;
+  }, 5000);
+}
+
+function showErrorMessage(message: string) {
+  clearMessages();
+  errorMessage.value = message;
+  messageTimeoutId.value = window.setTimeout(() => {
+    errorMessage.value = null;
+    messageTimeoutId.value = null;
+  }, 5000);
+}
 
 onMounted(() => {
   searchStore.setContext({
-    placeholder: "Search course types by name, description, or level",
-    emptyText: 'Try searching for "Foundations" or filtering by level',
+    placeholder: "Search course types by name",
+    emptyText: "Try searching for a course type name",
   });
   searchStore.clearQuery();
+  loadTypeCourses();
 });
 
 onBeforeUnmount(() => {
   searchStore.resetContext();
   searchStore.clearQuery();
+  clearMessages();
 });
 
 function onSortChange(payload: { key: string; direction: "asc" | "desc" }) {
   console.log("sort-change", payload);
 }
 
-function handleDelete(row: any) {
-  console.log("delete", row);
+async function handleDelete(row: { id: number; name: string }) {
+  try {
+    await deleteTypeCourse(row.id);
+    await loadTypeCourses();
+    showSuccessMessage("Type course deleted successfully");
+  } catch (error: any) {
+    console.error("Failed to delete type course", error);
+    const errorMsg =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to delete type course";
+    showErrorMessage(errorMsg);
+  }
 }
 </script>

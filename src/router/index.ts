@@ -12,7 +12,7 @@ const router = createRouter({
 });
 
 // Navigation guard to protect admin routes
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
 
   // Check if route requires authentication
@@ -25,11 +25,15 @@ router.beforeEach((to, from, next) => {
       });
       return;
     }
+    if (to.meta.requiresAdmin && !userStore.hasRole(1)) {
+      next({ name: "home" });
+      return;
+    }
     // User is authenticated, allow access
     next();
   } else if (to.name === "login" && userStore.isAuthenticated) {
     // If user is already logged in and tries to access login page, redirect to dashboard
-    next({ name: "dashboard" });
+    next({ name: "admin.dashboard" });
   } else {
     // Route doesn't require auth, allow access
     next();

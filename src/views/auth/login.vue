@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../../stores/userStore";
 
@@ -135,6 +135,23 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const loading = computed(() => userStore.loading);
+
+function redirectAuthenticatedUser() {
+  const redirect = router.currentRoute.value.query.redirect as
+    | string
+    | undefined;
+  router.replace(redirect || { name: "admin.dashboard" });
+}
+
+watch(
+  () => userStore.isAuthenticated,
+  (isAuth) => {
+    if (isAuth) {
+      redirectAuthenticatedUser();
+    }
+  },
+  { immediate: true }
+);
 
 function validate(): boolean {
   errors.login = null;
@@ -173,7 +190,7 @@ async function onSubmit() {
 
     // Redirect to intended page or dashboard
     const redirect = router.currentRoute.value.query.redirect as string;
-    router.push(redirect || { name: "dashboard" });
+    router.push(redirect || { name: "admin.dashboard" });
   } else {
     serverMessage.value = result.message || "Login failed. Please try again.";
     serverMessageType.value = "error";

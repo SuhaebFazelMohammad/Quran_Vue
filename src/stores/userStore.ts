@@ -25,6 +25,31 @@ export const useUserStore = defineStore("user", () => {
   const loading = ref(false);
 
   const isAuthenticated = computed(() => !!token.value && !!user.value);
+  const roleId = computed<number | null>(() => {
+    const currentUser = user.value as Record<string, any> | null;
+    if (!currentUser) return null;
+
+    const possibleRole =
+      currentUser.role_id ??
+      currentUser.roleId ??
+      currentUser.role ??
+      currentUser.type;
+
+    if (typeof possibleRole === "number") return possibleRole;
+    if (typeof possibleRole === "string") {
+      const parsed = Number(possibleRole);
+      return Number.isNaN(parsed) ? null : parsed;
+    }
+
+    return null;
+  });
+
+  function hasRole(targetRole: number | string) {
+    const requiredRole =
+      typeof targetRole === "string" ? Number(targetRole) : targetRole;
+    if (Number.isNaN(requiredRole)) return false;
+    return roleId.value === requiredRole;
+  }
 
   // Load user data from localStorage on initialization
   function loadFromStorage() {
@@ -140,6 +165,8 @@ export const useUserStore = defineStore("user", () => {
     user: computed(() => user.value),
     token: computed(() => token.value),
     isAuthenticated,
+    roleId,
+    hasRole,
     loading: computed(() => loading.value),
     login,
     logout,

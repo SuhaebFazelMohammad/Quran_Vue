@@ -3,8 +3,12 @@
     <div
       class="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/85 shadow-xl shadow-amber-500/10 backdrop-blur-lg transition-colors duration-500 dark:border-slate-800/70 dark:bg-slate-900/60 dark:shadow-black/40"
     >
-      <table class="min-w-full text-left text-sm text-slate-700 dark:text-slate-200">
-        <thead class="bg-slate-50/90 text-slate-600 dark:bg-slate-900/70 dark:text-slate-300">
+      <table
+        class="min-w-full text-left text-sm text-slate-700 dark:text-slate-200"
+      >
+        <thead
+          class="bg-slate-50/90 text-slate-600 dark:bg-slate-900/70 dark:text-slate-300"
+        >
           <tr>
             <th
               v-for="col in columns"
@@ -69,8 +73,12 @@
             v-for="(row, idx) in pagedRows"
             :key="rowKey(row, idx)"
             :class="[
-              striped && idx % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-900/40' : '',
-              hoverable ? 'transition hover:bg-amber-50/40 dark:hover:bg-amber-400/10' : '',
+              striped && idx % 2 === 1
+                ? 'bg-slate-50/60 dark:bg-slate-900/40'
+                : '',
+              hoverable
+                ? 'transition hover:bg-amber-50/40 dark:hover:bg-amber-400/10'
+                : '',
             ]"
           >
             <td
@@ -132,6 +140,11 @@ const props = withDefaults(
     hoverable?: boolean;
     pageSize?: number;
     modelValuePage?: number;
+    /**
+     * Optional total number of rows when using server-side pagination.
+     * If not provided, falls back to rows.length (client-side).
+     */
+    total?: number;
   }>(),
   {
     rows: () => [],
@@ -141,6 +154,7 @@ const props = withDefaults(
     hoverable: true,
     pageSize: 10,
     modelValuePage: 1,
+    total: undefined,
   }
 );
 
@@ -186,7 +200,7 @@ const sortedRows = computed(() => {
   });
 });
 
-const totalRows = computed(() => sortedRows.value.length);
+const totalRows = computed(() => props.total ?? sortedRows.value.length);
 
 const showPagination = computed(() => totalRows.value > props.pageSize);
 
@@ -203,9 +217,14 @@ const endRow = computed(() =>
   Math.min(totalRows.value, startRow.value + props.pageSize)
 );
 
-const pagedRows = computed(() =>
-  sortedRows.value.slice(startRow.value, endRow.value)
-);
+// If `total` is provided, we assume server-side pagination: parent already
+// provides only the rows for the current page, so we don't slice.
+const pagedRows = computed(() => {
+  if (props.total != null) {
+    return sortedRows.value;
+  }
+  return sortedRows.value.slice(startRow.value, endRow.value);
+});
 
 function rowKey(row: any, idx: number) {
   return row.id ?? idx;

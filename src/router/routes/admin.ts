@@ -6,129 +6,142 @@ import UsersEdit from "../../views/admin/users/edit.vue";
 import UsersShow from "../../views/admin/users/show.vue";
 import UsersProfile from "../../views/admin/profile.vue";
 import Course from "../../views/admin/course/index.vue";
+import CourseCreate from "../../views/admin/course/create.vue";
 import CourseEdit from "../../views/admin/course/edit.vue";
 import CourseShow from "../../views/admin/course/show.vue";
 import CourseType from "../../views/admin/course-type/index.vue";
 import CourseTypeCreate from "../../views/admin/course-type/create.vue";
 import CourseTypeEdit from "../../views/admin/course-type/edit.vue";
-import CourseTypeShow from "../../views/admin/course-type/show.vue";
 
 const AdminRouter: RouteRecordRaw[] = [
   {
-    path: "/dashboard",
-    name: "dashboard",
+    path: "/admin/dashboard",
+    name: "admin.dashboard",
     component: Dashboard,
     meta: {
       title: "Dashboard",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/users",
-    name: "users",
+    path: "/admin/users",
+    name: "admin.users",
     component: Users,
     meta: {
       title: "Users",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/users/create",
-    name: "users-create",
+    path: "/admin/users/create",
+    name: "admin.users.create",
     component: UsersCreate,
     meta: {
       title: "Create User",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/users/:id/edit",
-    name: "users-edit",
+    path: "/admin/users/:id/edit",
+    name: "admin.users.edit",
     component: UsersEdit,
     meta: {
       title: "Edit User",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/users/:id",
-    name: "users-show",
+    path: "/admin/users/:id",
+    name: "admin.users.show",
     component: UsersShow,
     meta: {
       title: "Show User",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/users/profile",
-    name: "users-profile",
+    path: "/admin/profile",
+    name: "admin.profile",
     component: UsersProfile,
     meta: {
       title: "Profile",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/course",
-    name: "course",
+    path: "/admin/course",
+    name: "admin.course",
     component: Course,
     meta: {
       title: "Course",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/course/:id(\\d+)/edit",
-    name: "course-edit",
+    path: "/admin/course/create",
+    name: "admin.course.create",
+    component: CourseCreate,
+    meta: {
+      title: "Create Course",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/course/:id(\\d+)/edit",
+    name: "admin.course.edit",
     component: CourseEdit,
     meta: {
       title: "Edit Course",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/course/:id(\\d+)",
-    name: "course-show",
+    path: "/admin/course/:id(\\d+)",
+    name: "admin.course.show",
     component: CourseShow,
     meta: {
       title: "Show Course",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/course-type",
-    name: "course-type",
+    path: "/admin/course-type",
+    name: "admin.course-type",
     component: CourseType,
     meta: {
       title: "Course Types",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/course-type/create",
-    name: "course-type-create",
+    path: "/admin/course-type/create",
+    name: "admin.course-type.create",
     component: CourseTypeCreate,
     meta: {
       title: "Create Course Type",
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
-    path: "/course-type/:id(\\d+)/edit",
-    name: "course-type-edit",
+    path: "/admin/course-type/:id/edit",
+    name: "admin.course-type.edit",
     component: CourseTypeEdit,
     meta: {
       title: "Edit Course Type",
       requiresAuth: true,
-    },
-  },
-  {
-    path: "/course-type/:id(\\d+)",
-    name: "course-type-show",
-    component: CourseTypeShow,
-    meta: {
-      title: "Show Course Type",
-      requiresAuth: true,
+      requiresAdmin: true,
     },
   },
 ];

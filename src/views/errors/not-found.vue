@@ -5,16 +5,27 @@
       The page you’re looking for doesn’t exist or has been moved. Please check the URL or return to the dashboard.
     </p>
     <RouterLink
-      to="/dashboard"
+      v-if="userStore.hasRole(1)"
+      to="/admin/dashboard"
       class="glass-button bg-amber-500/95 px-4 py-2 text-sm font-semibold shadow-amber-500/20"
     >
       Go to Dashboard
+    </RouterLink>
+    <RouterLink
+      v-else
+      to="/"
+      class="glass-button bg-amber-500/95 px-4 py-2 text-sm font-semibold shadow-amber-500/20"
+    >
+      Go to Home
     </RouterLink>
   </div>
 </template>
 
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import { useUserStore } from "../../stores/userStore";
+
+const userStore = useUserStore();
 </script>
 
 

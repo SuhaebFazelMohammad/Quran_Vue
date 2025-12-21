@@ -25,6 +25,13 @@ const shouldShowAuthLayout = computed(() => {
     return true;
   }
 
+  if(routeName === "not-found" && !userStore.hasRole(1)) {
+    return true;
+  }
+  if(routeName === "not-found" && userStore.hasRole(1)) {
+    return false;
+  }
+
   // Otherwise show admin layout
   return false;
 });

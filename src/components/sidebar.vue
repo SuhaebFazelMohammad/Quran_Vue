@@ -5,11 +5,11 @@
   >
     <nav class="p-4 space-y-1 text-sm">
       <RouterLink
-        to="/dashboard"
+        to="/admin/dashboard"
         :class="[
           'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
           isSidebarOpen ? 'justify-start' : 'justify-center',
-          isActive('/dashboard')
+          isActive('/admin/dashboard')
             ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
             : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
         ]"
@@ -19,11 +19,11 @@
       </RouterLink>
 
       <RouterLink
-        to="/users"
+        to="/admin/users"
         :class="[
           'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
           isSidebarOpen ? 'justify-start' : 'justify-center',
-          isActive('/users')
+          isActive('/admin/users')
             ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
             : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
         ]"
@@ -33,11 +33,11 @@
       </RouterLink>
 
       <RouterLink
-        to="/course"
+        to="/admin/course"
         :class="[
           'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
           isSidebarOpen ? 'justify-start' : 'justify-center',
-          isActive('/course')
+          isActive('/admin/course')
             ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
             : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
         ]"
@@ -47,11 +47,11 @@
       </RouterLink>
 
       <RouterLink
-        to="/course-type"
+        to="/admin/course-type"
         :class="[
           'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
           isSidebarOpen ? 'justify-start' : 'justify-center',
-          isActive('/course-type')
+          isActive('/admin/course-type')
             ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
             : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
         ]"
