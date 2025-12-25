@@ -185,6 +185,16 @@
         />
       </div>
 
+      <Image
+        v-if="showImageInput"
+        id="image"
+        v-model="form.image"
+        label="Profile Image"
+        placeholder="Upload profile image"
+        :error="errors.image"
+        :max-size-mb="5"
+      />
+
       <div class="flex items-center gap-3 pt-2">
         <button
           type="submit"
@@ -209,7 +219,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 import Text from "../../../components/input/text.vue";
 import PasswordInput from "../../../components/input/password.vue";
@@ -217,6 +227,7 @@ import Select, {
   type SelectOption,
 } from "../../../components/input/select.vue";
 import DateInput from "../../../components/input/date.vue";
+import Image from "../../../components/input/image.vue";
 import SuccessMessage from "../../../components/message/success.vue";
 import ErrorMessage from "../../../components/message/error.vue";
 import Heading from "../../../components/heading.vue";
@@ -251,6 +262,7 @@ interface UserForm {
   address: string;
   date_of_birth: string;
   listening_from: string;
+  image: File | string | null;
 }
 
 type FormErrors = Partial<
@@ -266,7 +278,8 @@ type FormErrors = Partial<
     | "city"
     | "address"
     | "date_of_birth"
-    | "listening_from",
+    | "listening_from"
+    | "image",
     string
   >
 >;
@@ -284,6 +297,12 @@ const form = ref<UserForm>({
   address: "",
   date_of_birth: "",
   listening_from: "",
+  image: null,
+});
+
+// Show image input only for admin (1) or moderator (2) roles
+const showImageInput = computed(() => {
+  return form.value.role === "1" || form.value.role === "2";
 });
 
 const errors = ref<FormErrors>({});
@@ -352,22 +371,51 @@ async function handleSubmit() {
       ? form.value.phone_num.replace(/\D/g, "")
       : undefined;
 
-    const createData: CreateUserData = {
-      first_name: form.value.first_name,
-      last_name: form.value.last_name,
-      email: form.value.email,
-      password: form.value.password,
-      password_confirmation: form.value.password_confirmation,
-      role: form.value.role || undefined,
-      phone_num: cleanPhoneNum || undefined,
-      gender: form.value.gender || undefined,
-      city: form.value.city || undefined,
-      address: form.value.address || undefined,
-      date_of_birth: form.value.date_of_birth || undefined,
-      listening_from: form.value.listening_from || undefined,
-    };
+    // If image is a File, use FormData; otherwise use regular JSON
+    const hasImageFile = form.value.image instanceof File;
 
-    await createUser(createData);
+    if (hasImageFile) {
+      const formData = new FormData();
+      formData.append("first_name", form.value.first_name);
+      formData.append("last_name", form.value.last_name);
+      formData.append("email", form.value.email);
+      formData.append("password", form.value.password);
+      formData.append(
+        "password_confirmation",
+        form.value.password_confirmation
+      );
+      if (form.value.role) formData.append("role", form.value.role);
+      if (cleanPhoneNum) formData.append("phone_num", cleanPhoneNum);
+      if (form.value.gender) formData.append("gender", form.value.gender);
+      if (form.value.city) formData.append("city", form.value.city);
+      if (form.value.address) formData.append("address", form.value.address);
+      if (form.value.date_of_birth)
+        formData.append("date_of_birth", form.value.date_of_birth);
+      if (form.value.listening_from)
+        formData.append("listening_from", form.value.listening_from);
+      if (form.value.image instanceof File) {
+        formData.append("image", form.value.image);
+      }
+
+      await createUser(formData as any);
+    } else {
+      const createData: CreateUserData = {
+        first_name: form.value.first_name,
+        last_name: form.value.last_name,
+        email: form.value.email,
+        password: form.value.password,
+        password_confirmation: form.value.password_confirmation,
+        role: form.value.role || undefined,
+        phone_num: cleanPhoneNum || undefined,
+        gender: form.value.gender || undefined,
+        city: form.value.city || undefined,
+        address: form.value.address || undefined,
+        date_of_birth: form.value.date_of_birth || undefined,
+        listening_from: form.value.listening_from || undefined,
+      };
+
+      await createUser(createData);
+    }
 
     showSuccessMessage("User created successfully");
 
@@ -385,6 +433,7 @@ async function handleSubmit() {
       address: "",
       date_of_birth: "",
       listening_from: "",
+      image: null,
     };
     errors.value = {};
   } catch (error: any) {

@@ -44,7 +44,7 @@ export interface CreateUserData {
   city?: string;
   address?: string;
   listening_from?: string;
-  image?: number | string;
+  image?: number | string | File;
 }
 
 export interface UpdateUserData {
@@ -208,7 +208,10 @@ export async function getUser(id: number): Promise<User> {
 /**
  * Create new user
  */
-export async function createUser(data: CreateUserData): Promise<User> {
+export async function createUser(data: CreateUserData | FormData): Promise<User> {
+  // If data is FormData, send it directly (for file uploads)
+  // The request interceptor will handle Content-Type header automatically
+  // Otherwise, send as JSON
   const response = await apiClient.post<{ data: User }>("/admin/users", data);
   return response.data.data;
 }
@@ -218,13 +221,24 @@ export async function createUser(data: CreateUserData): Promise<User> {
  */
 export async function updateUser(
   id: number,
-  data: UpdateUserData
+  data: UpdateUserData | FormData
 ): Promise<User> {
-  const response = await apiClient.put<{ data: User }>(
-    `/admin/users/${id}`,
-    data
-  );
-  return response.data.data;
+  // If data is FormData, use POST with _method=PUT for Laravel compatibility
+  // Otherwise, use PUT for JSON data
+  if (data instanceof FormData) {
+    data.append("_method", "PUT");
+    const response = await apiClient.post<{ data: User }>(
+      `/admin/users/${id}`,
+      data
+    );
+    return response.data.data;
+  } else {
+    const response = await apiClient.put<{ data: User }>(
+      `/admin/users/${id}`,
+      data
+    );
+    return response.data.data;
+  }
 }
 
 /**

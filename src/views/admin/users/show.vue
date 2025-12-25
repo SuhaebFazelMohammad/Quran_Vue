@@ -35,9 +35,16 @@
           <div class="flex flex-wrap items-start gap-4">
             <div class="flex items-center gap-4">
               <div
-                class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-xl font-semibold text-amber-700"
+                class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-xl font-semibold text-amber-700 overflow-hidden ring-2 ring-amber-200 dark:ring-amber-400/30"
               >
-                {{ initials }}
+                <img
+                  v-if="userImageUrl && !showInitials"
+                  :src="userImageUrl"
+                  :alt="user.name"
+                  class="h-full w-full object-cover"
+                  @error="handleImageError"
+                />
+                <span v-else>{{ initials }}</span>
               </div>
               <div>
                 <h2 class="text-xl font-semibold text-slate-800">
@@ -277,6 +284,7 @@ const loading = ref(true);
 const notFound = ref(false);
 const user = ref<UserOverview | null>(null);
 const stats = ref<StatCard[]>([]);
+const showInitials = ref(false);
 
 watch(
   () => route.params.id,
@@ -368,6 +376,56 @@ const formattedUpdatedAt = computed(() =>
   formatDateFromISO(user.value?.updatedAt)
 );
 
+const userImageUrl = computed(() => {
+  if (!user.value?.image) {
+    showInitials.value = true;
+    return null;
+  }
+
+  // Reset showInitials when we have an image
+  showInitials.value = false;
+
+  // If image is a string (URL or path)
+  if (typeof user.value.image === "string") {
+    // If empty string, show initials
+    if (!user.value.image.trim()) {
+      showInitials.value = true;
+      return null;
+    }
+    // If it's already a full URL (starts with http:// or https://), use it directly
+    if (
+      user.value.image.startsWith("http://") ||
+      user.value.image.startsWith("https://")
+    ) {
+      return user.value.image;
+    }
+    // If it's a relative path, prepend API URL
+    const apiUrl = import.meta.env.VITE_API_URL || "";
+    // Remove trailing slash from API URL if present
+    const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+    // Remove leading slash from image path if present
+    const imagePath = user.value.image.startsWith("/")
+      ? user.value.image
+      : `/${user.value.image}`;
+    return `${baseUrl}${imagePath}`;
+  }
+
+  // If image is a number (ID), construct storage URL
+  if (typeof user.value.image === "number") {
+    const apiUrl = import.meta.env.VITE_API_URL || "";
+    const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+    return `${baseUrl}/storage/${user.value.image}`;
+  }
+
+  showInitials.value = true;
+  return null;
+});
+
+function handleImageError() {
+  // If image fails to load, show initials instead
+  showInitials.value = true;
+}
+
 async function loadUser() {
   const idParam = Number(route.params.id);
   if (Number.isNaN(idParam)) {
@@ -380,6 +438,7 @@ async function loadUser() {
 
   try {
     loading.value = true;
+    showInitials.value = false; // Reset initials flag when loading new user
     const backendUser: User = await getUser(idParam);
 
     const name =

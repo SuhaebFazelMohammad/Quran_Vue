@@ -186,6 +186,17 @@
           </div>
         </div>
 
+        <Image
+          v-if="showImageInput"
+          id="image"
+          v-model="form.image"
+          label="Profile Image"
+          placeholder="Upload profile image"
+          :error="errors.image"
+          :max-size-mb="5"
+          :current-image="currentImageUrl"
+        />
+
         <div class="surface-panel space-y-4 px-4 py-4">
           <div class="flex flex-wrap items-center gap-4">
             <div>
@@ -438,6 +449,7 @@ import Select, {
 } from "../../../components/input/select.vue";
 import Text from "../../../components/input/text.vue";
 import DateInput from "../../../components/input/date.vue";
+import Image from "../../../components/input/image.vue";
 import SuccessMessage from "../../../components/message/success.vue";
 import ErrorMessage from "../../../components/message/error.vue";
 import { getUser, updateUser, type User } from "../../../api/users";
@@ -461,6 +473,7 @@ interface UserForm {
   date_of_birth: string;
   listening_from: string;
   deleted_at: string | null;
+  image: File | string | null;
 }
 
 type FormErrors = Partial<
@@ -475,7 +488,8 @@ type FormErrors = Partial<
     | "address"
     | "date_of_birth"
     | "listening_from"
-    | "deleted_at",
+    | "deleted_at"
+    | "image",
     string
   >
 >;
@@ -517,6 +531,23 @@ const form = ref<UserForm>({
   date_of_birth: "",
   listening_from: "",
   deleted_at: null,
+  image: null,
+});
+
+// Show image input only for admin (1) or moderator (2) roles
+const showImageInput = computed(() => {
+  return form.value.role === "1" || form.value.role === "2";
+});
+
+// Current image URL from backend (for display)
+const currentImageUrl = computed(() => {
+  if (form.value.image instanceof File) {
+    return null; // New file selected, don't show old image
+  }
+  if (typeof form.value.image === "string" && form.value.image) {
+    return form.value.image;
+  }
+  return null;
 });
 
 const originalForm = ref<UserForm | null>(null);
@@ -607,6 +638,16 @@ async function loadUser() {
     const rawGender: string | number | undefined = backendUser.gender;
     const genderId = rawGender != null ? String(rawGender) : undefined;
 
+    // Handle image: convert number to string, keep string as is, null stays null
+    let imageValue: File | string | null = null;
+    if (backendUser.image !== null && backendUser.image !== undefined) {
+      if (typeof backendUser.image === "number") {
+        imageValue = String(backendUser.image);
+      } else if (typeof backendUser.image === "string") {
+        imageValue = backendUser.image;
+      }
+    }
+
     const userForm: UserForm = {
       first_name: backendUser.first_name ?? first_name,
       last_name: backendUser.last_name ?? last_name,
@@ -619,6 +660,7 @@ async function loadUser() {
       date_of_birth: backendUser.date_of_birth ?? "",
       listening_from: backendUser.listening_from ?? "",
       deleted_at: backendUser.softDelete ?? null,
+      image: imageValue,
     };
 
     form.value = { ...userForm };
@@ -700,37 +742,76 @@ async function handleSubmit() {
       ? form.value.phone_num.replace(/\D/g, "")
       : undefined;
 
-    const updateData: any = {
-      first_name: form.value.first_name,
-      last_name: form.value.last_name,
-      email: form.value.email,
-      role: form.value.role,
-      phone_num: cleanPhoneNum || undefined,
-      city: form.value.city || undefined,
-      gender: form.value.gender || undefined,
-      address: form.value.address || undefined,
-      date_of_birth: form.value.date_of_birth || undefined,
-      listening_from: form.value.listening_from || undefined,
-    };
+    // If image is a File, use FormData; otherwise use regular JSON
+    const hasImageFile = form.value.image instanceof File;
 
-    // Handle soft delete status change
-    const originalDeletedAt = originalForm.value?.deleted_at ?? null;
-    const currentDeletedAt = form.value.deleted_at;
-
-    // If deleted_at changed, we need to handle it
-    // If current is null and original was not null, restore user
-    // If current is not null and original was null, soft delete user
-    if (currentDeletedAt !== originalDeletedAt) {
-      if (currentDeletedAt === null) {
-        // Restore user - set deleted_at to null
-        updateData.deleted_at = null;
-      } else {
-        // Soft delete user - set deleted_at to current timestamp
-        updateData.deleted_at = currentDeletedAt || new Date().toISOString();
+    if (hasImageFile) {
+      const formData = new FormData();
+      formData.append("first_name", form.value.first_name);
+      formData.append("last_name", form.value.last_name);
+      formData.append("email", form.value.email);
+      if (form.value.role) formData.append("role", form.value.role);
+      if (cleanPhoneNum) formData.append("phone_num", cleanPhoneNum);
+      if (form.value.city) formData.append("city", form.value.city);
+      if (form.value.gender) formData.append("gender", form.value.gender);
+      if (form.value.address) formData.append("address", form.value.address);
+      if (form.value.date_of_birth)
+        formData.append("date_of_birth", form.value.date_of_birth);
+      if (form.value.listening_from)
+        formData.append("listening_from", form.value.listening_from);
+      if (form.value.image instanceof File) {
+        formData.append("image", form.value.image);
       }
-    }
 
-    await updateUser(userId.value, updateData);
+      // Handle soft delete status change
+      const originalDeletedAt = originalForm.value?.deleted_at ?? null;
+      const currentDeletedAt = form.value.deleted_at;
+
+      if (currentDeletedAt !== originalDeletedAt) {
+        if (currentDeletedAt === null) {
+          formData.append("deleted_at", "");
+        } else {
+          formData.append(
+            "deleted_at",
+            currentDeletedAt || new Date().toISOString()
+          );
+        }
+      }
+
+      await updateUser(userId.value, formData as any);
+    } else {
+      const updateData: any = {
+        first_name: form.value.first_name,
+        last_name: form.value.last_name,
+        email: form.value.email,
+        role: form.value.role,
+        phone_num: cleanPhoneNum || undefined,
+        city: form.value.city || undefined,
+        gender: form.value.gender || undefined,
+        address: form.value.address || undefined,
+        date_of_birth: form.value.date_of_birth || undefined,
+        listening_from: form.value.listening_from || undefined,
+      };
+
+      // Handle soft delete status change
+      const originalDeletedAt = originalForm.value?.deleted_at ?? null;
+      const currentDeletedAt = form.value.deleted_at;
+
+      // If deleted_at changed, we need to handle it
+      // If current is null and original was not null, restore user
+      // If current is not null and original was null, soft delete user
+      if (currentDeletedAt !== originalDeletedAt) {
+        if (currentDeletedAt === null) {
+          // Restore user - set deleted_at to null
+          updateData.deleted_at = null;
+        } else {
+          // Soft delete user - set deleted_at to current timestamp
+          updateData.deleted_at = currentDeletedAt || new Date().toISOString();
+        }
+      }
+
+      await updateUser(userId.value, updateData);
+    }
 
     lastSavedAt.value = new Date();
     successMessage.value = "User details have been updated successfully.";

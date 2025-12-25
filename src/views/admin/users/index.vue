@@ -257,6 +257,8 @@ watch(query, () => {
   if (searchDebounceId.value !== null) {
     clearTimeout(searchDebounceId.value);
   }
+  // Show loading immediately when user starts typing
+  loading.value = true;
   searchDebounceId.value = window.setTimeout(() => {
     loadUsers();
   }, 300);
@@ -264,22 +266,26 @@ watch(query, () => {
 
 watch(selectedRole, () => {
   page.value = 1;
+  loading.value = true; // Show loading immediately when filter changes
   // Also refetch from backend so role filter is applied server-side if supported
   loadUsers();
 });
 
 watch(selectedGender, () => {
   page.value = 1;
+  loading.value = true; // Show loading immediately when filter changes
   loadUsers();
 });
 
 watch(selectedDeletedStatus, () => {
   page.value = 1;
+  loading.value = true; // Show loading immediately when filter changes
   loadUsers();
 });
 
 watch(pageSize, () => {
   page.value = 1;
+  loading.value = true; // Show loading immediately when page size changes
   loadUsers();
 });
 
