@@ -51,6 +51,7 @@
           :src="previewUrl"
           alt="Selected preview"
           class="h-full w-full object-cover"
+          @error="handleImageError"
         />
         <div
           class="absolute inset-0 bg-slate-900/0 transition hover:bg-slate-900/40"
@@ -160,13 +161,29 @@ watch(
   () => props.modelValue,
   (value) => {
     resetPreview();
-    if (!value) {
+
+    // If value is null, undefined, or empty string, don't show preview
+    if (value === null || value === undefined || value === "") {
       previewUrl.value = null;
       return;
     }
 
     if (typeof value === "string") {
-      previewUrl.value = value;
+      const trimmed = value.trim();
+      // Only show preview if it's a valid URL or path
+      // Valid formats: http://, https://, /path, or data:image
+      if (
+        trimmed !== "" &&
+        (trimmed.startsWith("http://") ||
+          trimmed.startsWith("https://") ||
+          trimmed.startsWith("/") ||
+          trimmed.startsWith("data:image"))
+      ) {
+        previewUrl.value = trimmed;
+      } else {
+        // Invalid string (like a number ID "123" or empty) - don't show preview
+        previewUrl.value = null;
+      }
       return;
     }
 
@@ -264,5 +281,11 @@ function handleContainerClick(event: MouseEvent) {
     return;
   }
   triggerFileDialog();
+}
+
+function handleImageError() {
+  // If image fails to load, clear the preview to show empty state
+  previewUrl.value = null;
+  emit("update:modelValue", null);
 }
 </script>
