@@ -37,8 +37,10 @@
           <Icon icon="heroicons:bell-alert-20-solid" class="w-5 h-5" />
           <span
             v-if="hasUnread"
-            class="size-2 rounded-full bg-red-500 absolute top-1 right-2 animate-ping"
-          ></span>
+            class="absolute top-1 right-2 flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-red-500 text-[10px] font-bold text-white px-1"
+          >
+            {{ unreadCount > 9 ? "9+" : unreadCount }}
+          </span>
         </button>
 
         <transition
@@ -62,24 +64,46 @@
               <span
                 class="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-600 dark:bg-amber-400/25 dark:text-amber-100"
               >
-                {{ notifications.length }}
+                {{ unreadCount }}
               </span>
             </div>
-            <div class="mt-3 space-y-3">
+            <div
+              class="notifications-scroll mt-3 space-y-3 max-h-[360px] overflow-y-auto pr-1"
+              style="
+                scrollbar-width: thin;
+                scrollbar-color: rgb(252 211 77) rgb(254 243 199 / 0.5);
+              "
+            >
               <div
-                v-if="!notifications.length"
+                v-if="loadingNotifications"
+                class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-amber-200/60 bg-amber-50/40 p-6 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:bg-slate-900/60 dark:text-slate-300"
+              >
+                <Icon
+                  icon="heroicons:arrow-path-20-solid"
+                  class="h-6 w-6 text-amber-400 animate-spin"
+                />
+                <span>Loading notifications...</span>
+              </div>
+              <div
+                v-else-if="!formattedNotifications.length"
                 class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-amber-200/60 bg-amber-50/40 p-6 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:bg-slate-900/60 dark:text-slate-300"
               >
                 <Icon
                   icon="heroicons:bell-slash-20-solid"
                   class="h-6 w-6 text-amber-400"
                 />
-                <span>No new notifications</span>
+                <span>{{
+                  showReadNotifications
+                    ? "No notifications"
+                    : "No unread notifications"
+                }}</span>
               </div>
               <div
-                v-for="notification in notifications"
+                v-else
+                v-for="notification in formattedNotifications"
                 :key="notification.id"
-                class="group relative overflow-hidden rounded-xl border border-amber-200/60 bg-gradient-to-br from-white via-white/80 to-amber-50/40 p-3 shadow-md shadow-amber-100/40 transition hover:-translate-y-0.5 hover:shadow-amber-200/55 dark:border-slate-800/60 dark:from-slate-950/90 dark:via-slate-900/80 dark:to-slate-950/90 dark:shadow-slate-950/60 dark:hover:border-amber-400/40"
+                class="group relative overflow-hidden rounded-xl border border-amber-200/60 bg-gradient-to-br from-white via-white/80 to-amber-50/40 p-3 shadow-md shadow-amber-100/40 transition hover:-translate-y-0.5 hover:shadow-amber-200/55 cursor-pointer dark:border-slate-800/60 dark:from-slate-950/90 dark:via-slate-900/80 dark:to-slate-950/90 dark:shadow-slate-950/60 dark:hover:border-amber-400/40"
+                @click="handleNotificationClick(notification)"
               >
                 <div class="flex items-start gap-3">
                   <div
@@ -117,15 +141,34 @@
                 </span>
               </div>
             </div>
-            <button
-              v-if="notifications.length"
-              type="button"
-              class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-400/40 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/50 dark:from-amber-400 dark:via-amber-500 dark:to-amber-400"
-              @click="markAllAsRead"
-            >
-              <Icon icon="heroicons:check-badge-20-solid" class="h-5 w-5" />
-              Mark all as read
-            </button>
+            <div class="mt-3 flex flex-col gap-2">
+              <button
+                v-if="formattedNotifications.length && hasUnread"
+                type="button"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-400/40 transition hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/50 dark:from-amber-400 dark:via-amber-500 dark:to-amber-400"
+                @click="markAllAsRead"
+              >
+                <Icon icon="heroicons:check-badge-20-solid" class="h-5 w-5" />
+                Mark all as read
+              </button>
+              <button
+                v-if="readNotificationsCount > 0"
+                type="button"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-amber-200/60 bg-white/90 px-3 py-2 text-sm font-medium text-amber-600 shadow-md shadow-amber-500/10 transition hover:border-amber-300 hover:bg-amber-50/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/50 dark:border-amber-400/60 dark:bg-slate-900/80 dark:text-amber-300 dark:hover:border-amber-400 dark:hover:bg-slate-800/80"
+                @click="showReadNotifications = !showReadNotifications"
+              >
+                <Icon
+                  :icon="
+                    showReadNotifications
+                      ? 'heroicons:eye-slash-20-solid'
+                      : 'heroicons:eye-20-solid'
+                  "
+                  class="h-5 w-5"
+                />
+                {{ showReadNotifications ? "Hide" : "Show" }} read notifications
+                ({{ readNotificationsCount }})
+              </button>
+            </div>
           </div>
         </transition>
       </div>
@@ -145,6 +188,12 @@
         <Icon icon="heroicons:user-20-solid" class="w-5 h-5" />
       </RouterLink>
     </div>
+
+    <!-- Notification Information Alert -->
+    <BoxInformation
+      v-model="showNotificationAlert"
+      :data="selectedNotificationData"
+    />
   </header>
 </template>
 
@@ -156,6 +205,13 @@ import { useSidebarStore } from "../stores/sidebar";
 import { useSearchStore } from "../stores/search";
 import SearchInput from "./input/search.vue";
 import { useThemeStore } from "../stores/darkMode";
+import {
+  getNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+  type Notification,
+} from "../api/auth";
+import BoxInformation from "./alerts/BoxInformation.vue";
 
 const sidebarStore = useSidebarStore();
 const searchStore = useSearchStore();
@@ -175,52 +231,178 @@ const themeIcon = computed(() =>
 const themeLabel = computed(() => (isDark.value ? "Light mode" : "Dark mode"));
 
 const isNotificationOpen = ref(false);
-const notifications = ref([
-  {
-    id: 1,
-    title: "New student enrolled",
-    description: "Fatima joined the Tajweed Foundations course.",
-    timeAgo: "5 mins ago",
-    unread: true,
-    icon: "heroicons:user-plus-20-solid",
-  },
-  {
-    id: 2,
-    title: "Feedback received",
-    description: "A new testimonial has been submitted for Course Types.",
-    timeAgo: "2 hours ago",
-    unread: true,
-    icon: "heroicons:chat-bubble-left-right-20-solid",
-  },
-  {
-    id: 3,
-    title: "Schedule updated",
-    description: "Upcoming class schedule was updated by Admin Bilal.",
-    timeAgo: "Yesterday",
-    unread: false,
-    icon: "heroicons:calendar-days-20-solid",
-  },
-]);
-
-const hasUnread = computed(() => notifications.value.some((n) => n.unread));
+const notifications = ref<Notification[]>([]);
+const loadingNotifications = ref(false);
 const notificationRef = ref<HTMLElement | null>(null);
+const showReadNotifications = ref(false);
+const showNotificationAlert = ref(false);
+const selectedNotificationData = ref<Record<string, any>>({});
 
-function toggleSidebar() {
-  sidebarStore.toggle();
+// Format notification for display
+function formatNotification(notification: Notification) {
+  // Get notification data - Laravel notifications typically have a 'data' field
+  const data = notification.data || {};
+  const type = notification.type || "";
+
+  // Default icon based on notification type
+  let icon = "heroicons:bell-20-solid";
+  if (type.includes("user") || type.includes("student")) {
+    icon = "heroicons:user-plus-20-solid";
+  } else if (type.includes("feedback") || type.includes("testimonial")) {
+    icon = "heroicons:chat-bubble-left-right-20-solid";
+  } else if (type.includes("schedule") || type.includes("calendar")) {
+    icon = "heroicons:calendar-days-20-solid";
+  } else if (type.includes("course")) {
+    icon = "heroicons:book-open-20-solid";
+  }
+
+  // Get title and description from notification data
+  const title = data.title || data.message || type || "New notification";
+  const description =
+    data.description ||
+    data.body ||
+    data.message ||
+    "You have a new notification";
+
+  // Calculate time ago
+  const createdAt = new Date(notification.created_at);
+  const now = new Date();
+  const diffInSeconds = Math.floor(
+    (now.getTime() - createdAt.getTime()) / 1000
+  );
+  let timeAgo = "";
+
+  if (diffInSeconds < 60) {
+    timeAgo = "Just now";
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    timeAgo = `${minutes} ${minutes === 1 ? "min" : "mins"} ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    timeAgo = `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+  } else if (diffInSeconds < 604800) {
+    const days = Math.floor(diffInSeconds / 86400);
+    timeAgo = `${days} ${days === 1 ? "day" : "days"} ago`;
+  } else {
+    timeAgo = createdAt.toLocaleDateString();
+  }
+
+  return {
+    id: notification.id,
+    title,
+    description,
+    timeAgo,
+    unread: !notification.read_at,
+    icon,
+    notification, // Keep original notification data
+  };
 }
 
-function toggleNotifications() {
-  isNotificationOpen.value = !isNotificationOpen.value;
-  if (!isNotificationOpen.value) {
-    markAllAsRead();
+const formattedNotifications = computed(() => {
+  const all = notifications.value.map(formatNotification);
+  // Filter out read notifications if showReadNotifications is false
+  if (!showReadNotifications.value) {
+    return all.filter((n) => n.unread);
+  }
+  return all;
+});
+
+const readNotificationsCount = computed(() => {
+  return notifications.value.filter((n) => n.read_at).length;
+});
+
+const hasUnread = computed(() => {
+  return notifications.value.some((n) => !n.read_at);
+});
+
+const unreadCount = computed(() => {
+  return notifications.value.filter((n) => !n.read_at).length;
+});
+
+async function loadNotifications() {
+  try {
+    loadingNotifications.value = true;
+    const response = await getNotifications();
+    // Use all notifications for display
+    notifications.value = response.notifications.all || [];
+  } catch (error) {
+    console.error("Failed to load notifications:", error);
+    notifications.value = [];
+  } finally {
+    loadingNotifications.value = false;
   }
 }
 
-function markAllAsRead() {
-  notifications.value = notifications.value.map((notification) => ({
-    ...notification,
-    unread: false,
-  }));
+async function toggleNotifications() {
+  isNotificationOpen.value = !isNotificationOpen.value;
+
+  // When opening, refresh notifications to get latest data
+  if (isNotificationOpen.value) {
+    await loadNotifications();
+  } else {
+    // When closing, mark all as read
+    await markAllAsRead();
+  }
+}
+
+async function markAllAsRead() {
+  if (!hasUnread.value) return;
+
+  try {
+    // Mark all as read via API
+    await markAllNotificationsAsRead();
+    // Refresh notifications to get updated read status
+    await loadNotifications();
+  } catch (error) {
+    console.error("Failed to mark notifications as read:", error);
+    // On error, still refresh to get latest state
+    await loadNotifications();
+  }
+}
+
+async function handleNotificationClick(
+  notification: ReturnType<typeof formatNotification>
+) {
+  // Extract all notification data - pass the entire data object
+  const notificationData = notification.notification?.data || {};
+
+  // Also include the notification metadata if available
+  selectedNotificationData.value = {
+    ...notificationData,
+    // Include notification metadata
+    notification_id: notification.id,
+    notification_type: notification.notification?.type,
+    created_at: notification.notification?.created_at,
+    read_at: notification.notification?.read_at,
+  };
+
+  // Show the alert
+  showNotificationAlert.value = true;
+
+  // Mark as read if it's unread
+  if (notification.unread) {
+    try {
+      // Mark notification as read via API
+      await markNotificationAsRead(notification.id);
+
+      // Update local state immediately for better UX
+      const index = notifications.value.findIndex(
+        (n) => n.id === notification.id
+      );
+      if (index !== -1 && notifications.value[index]) {
+        // Update the read_at property directly
+        notifications.value[index].read_at = new Date().toISOString();
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+      // Refresh notifications to get latest state
+      await loadNotifications();
+    }
+  }
+}
+
+function toggleSidebar() {
+  sidebarStore.toggle();
 }
 
 function handleClickOutside(event: MouseEvent) {
@@ -234,9 +416,44 @@ function handleClickOutside(event: MouseEvent) {
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  // Load notifications on mount
+  loadNotifications();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 </script>
+
+<style scoped>
+/* Custom scrollbar styling for notifications */
+.notifications-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notifications-scroll::-webkit-scrollbar-track {
+  background: rgb(254 243 199 / 0.5);
+  border-radius: 10px;
+}
+
+.notifications-scroll::-webkit-scrollbar-thumb {
+  background: rgb(252 211 77);
+  border-radius: 10px;
+}
+
+.notifications-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(251 191 36);
+}
+
+.dark .notifications-scroll::-webkit-scrollbar-track {
+  background: rgb(30 41 59);
+}
+
+.dark .notifications-scroll::-webkit-scrollbar-thumb {
+  background: rgb(217 119 6);
+}
+
+.dark .notifications-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(194 65 12);
+}
+</style>
