@@ -15,6 +15,7 @@ import CourseTypeEdit from "../../views/admin/course-type/edit.vue";
 import Tafsir from "../../views/admin/tafsir/index.vue";
 import TafsirCreate from "../../views/admin/tafsir/create.vue";
 import TafsirEdit from "../../views/admin/tafsir/edit.vue";
+import Permission from "../../views/admin/permission/index.vue";
 
 const AdminRouter: RouteRecordRaw[] = [
   {
@@ -173,6 +174,16 @@ const AdminRouter: RouteRecordRaw[] = [
     component: TafsirEdit,
     meta: {
       title: "Edit Tafsir",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/permission",
+    name: "admin.permission",
+    component: Permission,
+    meta: {
+      title: "Permission",
       requiresAuth: true,
       requiresAdmin: true,
     },

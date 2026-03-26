@@ -73,6 +73,20 @@
         <Icon icon="heroicons:book-open-20-solid" class="w-4 h-4" />
         <span v-if="isSidebarOpen">Tafsir</span>
       </RouterLink>
+
+      <RouterLink
+        to="/admin/permission"
+        :class="[
+          'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
+          isSidebarOpen ? 'justify-start' : 'justify-center',
+          isActive('/admin/permission')
+            ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
+            : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
+        ]"
+      >
+        <Icon icon="heroicons:shield-check-20-solid" class="w-4 h-4" />
+        <span v-if="isSidebarOpen">Permission</span>
+      </RouterLink>
     </nav>
 
     <div
