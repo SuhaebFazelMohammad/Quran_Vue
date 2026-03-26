@@ -12,6 +12,9 @@ import CourseShow from "../../views/admin/course/show.vue";
 import CourseType from "../../views/admin/course-type/index.vue";
 import CourseTypeCreate from "../../views/admin/course-type/create.vue";
 import CourseTypeEdit from "../../views/admin/course-type/edit.vue";
+import Tafsir from "../../views/admin/tafsir/index.vue";
+import TafsirCreate from "../../views/admin/tafsir/create.vue";
+import TafsirEdit from "../../views/admin/tafsir/edit.vue";
 
 const AdminRouter: RouteRecordRaw[] = [
   {
@@ -140,6 +143,36 @@ const AdminRouter: RouteRecordRaw[] = [
     component: CourseTypeEdit,
     meta: {
       title: "Edit Course Type",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/tafsir",
+    name: "admin.tafsir",
+    component: Tafsir,
+    meta: {
+      title: "Tafsir",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/tafsir/create",
+    name: "admin.tafsir.create",
+    component: TafsirCreate,
+    meta: {
+      title: "Create Tafsir",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/tafsir/:id/edit",
+    name: "admin.tafsir.edit",
+    component: TafsirEdit,
+    meta: {
+      title: "Edit Tafsir",
       requiresAuth: true,
       requiresAdmin: true,
     },
