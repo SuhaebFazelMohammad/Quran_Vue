@@ -65,9 +65,17 @@ apiClient.interceptors.response.use(
     // But don't redirect if we're already on login page (to avoid loops)
     if (error.response?.status === 401) {
       const userStore = useUserStore();
-      // Only logout if we have a token (avoid logout on login attempt)
-      if (userStore.token && window.location.pathname !== "/login") {
-        userStore.logout();
+      const requestUrl = String(error.config?.url || "");
+      const isAuthRequest =
+        requestUrl.includes("/login") || requestUrl.includes("/logout");
+
+      // If token is invalid/expired, clear local auth state immediately.
+      // Avoid calling logout API here to prevent 401 -> logout -> 401 loops.
+      if (userStore.token && !isAuthRequest) {
+        userStore.clearAuthState();
+      }
+
+      if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
     }

@@ -87,6 +87,48 @@
         <Icon icon="heroicons:shield-check-20-solid" class="w-4 h-4" />
         <span v-if="isSidebarOpen">Permission</span>
       </RouterLink>
+
+      <RouterLink
+        to="/admin/center-types"
+        :class="[
+          'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
+          isSidebarOpen ? 'justify-start' : 'justify-center',
+          isActive('/admin/center-types')
+            ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
+            : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
+        ]"
+      >
+        <Icon icon="heroicons:tag-20-solid" class="w-4 h-4" />
+        <span v-if="isSidebarOpen">Center Types</span>
+      </RouterLink>
+
+      <RouterLink
+        to="/admin/quran-centers"
+        :class="[
+          'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
+          isSidebarOpen ? 'justify-start' : 'justify-center',
+          isActive('/admin/quran-centers')
+            ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
+            : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
+        ]"
+      >
+        <Icon icon="heroicons:building-library-20-solid" class="w-4 h-4" />
+        <span v-if="isSidebarOpen">Quran Centers</span>
+      </RouterLink>
+
+      <RouterLink
+        to="/admin/user-centers"
+        :class="[
+          'flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200',
+          isSidebarOpen ? 'justify-start' : 'justify-center',
+          isActive('/admin/user-centers')
+            ? 'bg-amber-500/15 text-amber-600 shadow-inner shadow-amber-500/20 dark:bg-amber-400/20 dark:text-amber-200'
+            : 'text-slate-600 hover:bg-slate-100/70 dark:text-slate-300 dark:hover:bg-slate-800/70',
+        ]"
+      >
+        <Icon icon="heroicons:user-group-20-solid" class="w-4 h-4" />
+        <span v-if="isSidebarOpen">User Centers</span>
+      </RouterLink>
     </nav>
 
     <div

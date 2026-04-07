@@ -81,6 +81,13 @@ export const useUserStore = defineStore("user", () => {
     localStorage.removeItem("auth_user");
   }
 
+  // Clear in-memory and persisted auth state
+  function clearAuthState() {
+    user.value = null;
+    token.value = null;
+    clearStorage();
+  }
+
   // Login function
   async function login(
     credentials: LoginCredentials
@@ -144,9 +151,7 @@ export const useUserStore = defineStore("user", () => {
       console.error("Logout API error:", error);
     } finally {
       // Always clear local state
-      user.value = null;
-      token.value = null;
-      clearStorage();
+      clearAuthState();
     }
   }
 
@@ -170,6 +175,7 @@ export const useUserStore = defineStore("user", () => {
     loading: computed(() => loading.value),
     login,
     logout,
+    clearAuthState,
     updateUser,
     loadFromStorage,
   };

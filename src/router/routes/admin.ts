@@ -16,6 +16,15 @@ import Tafsir from "../../views/admin/tafsir/index.vue";
 import TafsirCreate from "../../views/admin/tafsir/create.vue";
 import TafsirEdit from "../../views/admin/tafsir/edit.vue";
 import Permission from "../../views/admin/permission/index.vue";
+import CenterTypes from "../../views/admin/center-types/index.vue";
+import CenterTypesCreate from "../../views/admin/center-types/create.vue";
+import CenterTypesEdit from "../../views/admin/center-types/edit.vue";
+import QuranCenters from "../../views/admin/quran-centers/index.vue";
+import QuranCentersCreate from "../../views/admin/quran-centers/create.vue";
+import QuranCentersEdit from "../../views/admin/quran-centers/edit.vue";
+import UserCenters from "../../views/admin/user-centers/index.vue";
+import UserCentersCreate from "../../views/admin/user-centers/create.vue";
+import UserCentersEdit from "../../views/admin/user-centers/edit.vue";
 
 const AdminRouter: RouteRecordRaw[] = [
   {
@@ -184,6 +193,96 @@ const AdminRouter: RouteRecordRaw[] = [
     component: Permission,
     meta: {
       title: "Permission",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/center-types",
+    name: "admin.center-types",
+    component: CenterTypes,
+    meta: {
+      title: "Center Types",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/center-types/create",
+    name: "admin.center-types.create",
+    component: CenterTypesCreate,
+    meta: {
+      title: "Create Center Type",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/center-types/:id/edit",
+    name: "admin.center-types.edit",
+    component: CenterTypesEdit,
+    meta: {
+      title: "Edit Center Type",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/quran-centers",
+    name: "admin.quran-centers",
+    component: QuranCenters,
+    meta: {
+      title: "Quran Centers",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/quran-centers/create",
+    name: "admin.quran-centers.create",
+    component: QuranCentersCreate,
+    meta: {
+      title: "Create Quran Center",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/quran-centers/:id/edit",
+    name: "admin.quran-centers.edit",
+    component: QuranCentersEdit,
+    meta: {
+      title: "Edit Quran Center",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/user-centers",
+    name: "admin.user-centers",
+    component: UserCenters,
+    meta: {
+      title: "User Centers",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/user-centers/create",
+    name: "admin.user-centers.create",
+    component: UserCentersCreate,
+    meta: {
+      title: "Create User Center",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/admin/user-centers/:id/edit",
+    name: "admin.user-centers.edit",
+    component: UserCentersEdit,
+    meta: {
+      title: "Edit User Center",
       requiresAuth: true,
       requiresAdmin: true,
     },
